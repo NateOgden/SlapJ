@@ -28,6 +28,7 @@ public class Slapjack extends ApplicationAdapter {
 	private Deck deck;
 	
 	
+	//Don't touch create or render
 	@Override
 	public void create () {
 		batch = new SpriteBatch();
@@ -36,7 +37,7 @@ public class Slapjack extends ApplicationAdapter {
 		deck = new Deck(cardSpriteSheet);
 		stage = new Stage();
 	}
-
+	//Don't touch create or render
 	@Override
 	public void render () {
 		Gdx.gl.glClearColor(1, 0, 0, 1);
