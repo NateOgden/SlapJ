@@ -26,7 +26,7 @@ public class Slapjack extends ApplicationAdapter {
 	private Texture cardSpriteSheet;
 	private Stage stage;
 	private Deck deck;
-	private Board board;
+	
 	
 	@Override
 	public void create () {
