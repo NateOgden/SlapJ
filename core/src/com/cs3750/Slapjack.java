@@ -1,5 +1,8 @@
 package com.cs3750;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import com.badlogic.gdx.ApplicationAdapter;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Color;
@@ -47,6 +50,5 @@ public class Slapjack extends ApplicationAdapter {
 		batch.end();
 		Gdx.input.setInputProcessor(stage); 
 		stage.draw();
-		
 	}
 }
