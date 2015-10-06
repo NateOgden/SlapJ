@@ -6,12 +6,14 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Random;
 
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 
 public class Deck {
 	List<Card> cards = new ArrayList<Card>();
+	ArrayList<Card> playerHand = new ArrayList<Card>();
 	
 	public Deck(Texture cardSpriteSheet){
 		TextureRegion[][] cardTextureRegion = TextureRegion.split(cardSpriteSheet, cardSpriteSheet.getWidth()/13, cardSpriteSheet.getHeight()/4);
@@ -24,7 +26,7 @@ public class Deck {
 			}
 		}
 	}
-	
+
 	public void shuffle(){
 		long seed = System.nanoTime();
 		Collections.shuffle(cards, new Random(seed));
@@ -36,5 +38,13 @@ public class Deck {
 	
 	public void addAll(Collection <? extends Card> collection){
 		cards.addAll(collection);
-	}
+	}	
+		
+	public ArrayList<Card> dealCardsToPlayers(int numOfPlayers){
+		
+		for(int i = 1; i < numOfPlayers + 1; i++){
+
+		}
+		return playerHand;
+	} 
 }
