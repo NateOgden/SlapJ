@@ -37,6 +37,7 @@ public class Slapjack extends ApplicationAdapter {
 	private Texture cardSpriteSheet;
 	
 	//for cardback animations
+	private Sprite[] cardBackSprites;
 	private Texture cardBackTexture;
 	private Sprite cardBack;
 	private Sprite cardBackUL;
@@ -86,16 +87,23 @@ public class Slapjack extends ApplicationAdapter {
 		
 		//cardBack 
 		cardBackTexture = new Texture(Gdx.files.internal("cardback.png"));
-		cardBack = new Sprite(cardBackTexture);
-		cardBack.setPosition((Gdx.graphics.getWidth()-cardBack.getWidth())/2, (Gdx.graphics.getHeight()-cardBack.getHeight())/2);
-		cardBackUL = new Sprite(cardBackTexture);
-		cardBackUL.setPosition((Gdx.graphics.getWidth()-cardBack.getWidth())/2, (Gdx.graphics.getHeight()-cardBack.getHeight())/2);
-		cardBackLL = new Sprite(cardBackTexture);
-		cardBackLL.setPosition((Gdx.graphics.getWidth()-cardBack.getWidth())/2, (Gdx.graphics.getHeight()-cardBack.getHeight())/2);
-		cardBackUR = new Sprite(cardBackTexture);
-		cardBackUR.setPosition((Gdx.graphics.getWidth()-cardBack.getWidth())/2, (Gdx.graphics.getHeight()-cardBack.getHeight())/2);
-		cardBackLR = new Sprite(cardBackTexture);
-		cardBackLR.setPosition((Gdx.graphics.getWidth()-cardBack.getWidth())/2, (Gdx.graphics.getHeight()-cardBack.getHeight())/2);
+		
+		cardBackSprites = new Sprite[numPlayers];
+		for(int i = 0; i < numPlayers; i++){
+			cardBackSprites[i] = new Sprite(cardBackTexture);
+			cardBackSprites[i].setPosition((Gdx.graphics.getWidth()-cardBackSprites[i].getWidth())/2, (Gdx.graphics.getHeight()-cardBackSprites[i].getHeight())/2);
+		}
+		
+//		cardBack = new Sprite(cardBackTexture);
+//		cardBack.setPosition((Gdx.graphics.getWidth()-cardBack.getWidth())/2, (Gdx.graphics.getHeight()-cardBack.getHeight())/2);
+//		cardBackUL = new Sprite(cardBackTexture);
+//		cardBackUL.setPosition((Gdx.graphics.getWidth()-cardBack.getWidth())/2, (Gdx.graphics.getHeight()-cardBack.getHeight())/2);
+//		cardBackLL = new Sprite(cardBackTexture);
+//		cardBackLL.setPosition((Gdx.graphics.getWidth()-cardBack.getWidth())/2, (Gdx.graphics.getHeight()-cardBack.getHeight())/2);
+//		cardBackUR = new Sprite(cardBackTexture);
+//		cardBackUR.setPosition((Gdx.graphics.getWidth()-cardBack.getWidth())/2, (Gdx.graphics.getHeight()-cardBack.getHeight())/2);
+//		cardBackLR = new Sprite(cardBackTexture);
+//		cardBackLR.setPosition((Gdx.graphics.getWidth()-cardBack.getWidth())/2, (Gdx.graphics.getHeight()-cardBack.getHeight())/2);
 		
 		MAX_HEIGHT = Gdx.graphics.getHeight()-215;
 		MIN_HEIGHT = 75;
@@ -162,10 +170,14 @@ public class Slapjack extends ApplicationAdapter {
 		batch.begin();
 		batch.draw(background, 0, 0);
 		//cardBack.draw(batch);
-		cardBackUL.draw(batch);
-		cardBackLL.draw(batch);
-		cardBackUR.draw(batch);
-		cardBackLR.draw(batch);
+//		cardBackUL.draw(batch);
+//		cardBackLL.draw(batch);
+//		cardBackUR.draw(batch);
+//		cardBackLR.draw(batch);
+
+		for(Sprite s: cardBackSprites){
+			s.draw(batch);
+		}
 		batch.end();
 		
 		if(gamePhase == GamePhases.TITLE_SCREEN){
@@ -174,7 +186,7 @@ public class Slapjack extends ApplicationAdapter {
 		} 
 		
 		if(gamePhase == GamePhases.DEAL && timer >= 4){
-			//stopDealAnimation();
+			stopDealAnimation();
 			timer = 0f;
 			gamePhase = GamePhases.GAME_PLAY;
 		}else if(gamePhase == GamePhases.DEAL){
@@ -196,72 +208,111 @@ public class Slapjack extends ApplicationAdapter {
 	private void stopDealAnimation() {
 		//again, testing with 4 players, needs to be refactored for different amount of players		
 		//target positions
-		Vector2 targetUpperLeft = new Vector2(MIN_WIDTH,MAX_HEIGHT);
-		Vector2 targetLowerLeft = new Vector2(MIN_WIDTH,MIN_HEIGHT);
-		Vector2 targetUpperRight = new Vector2(MAX_WIDTH,MAX_HEIGHT);
-		Vector2 targetLowerRight = new Vector2(MAX_WIDTH,MIN_HEIGHT);
+//		Vector2 targetUpperLeft = new Vector2(MIN_WIDTH,MAX_HEIGHT);
+//		Vector2 targetLowerLeft = new Vector2(MIN_WIDTH,MIN_HEIGHT);
+//		Vector2 targetUpperRight = new Vector2(MAX_WIDTH,MAX_HEIGHT);
+//		Vector2 targetLowerRight = new Vector2(MAX_WIDTH,MIN_HEIGHT);
+//		
+//		cardBackUL.setPosition(targetUpperLeft.x, targetUpperLeft.y);
+//		cardBackLL.setPosition(targetLowerLeft.x, targetLowerLeft.y);
+//		cardBackUR.setPosition(targetUpperRight.x, targetUpperRight.y);
+//		cardBackLR.setPosition(targetLowerRight.x, targetLowerRight.y);
 		
-		cardBackUL.setPosition(targetUpperLeft.x, targetUpperLeft.y);
-		cardBackLL.setPosition(targetLowerLeft.x, targetLowerLeft.y);
-		cardBackUR.setPosition(targetUpperRight.x, targetUpperRight.y);
-		cardBackLR.setPosition(targetLowerRight.x, targetLowerRight.y);
+		//multiple player animations
+		Vector2 targetPositions[] = new Vector2[numPlayers];
+		int margin = ((1080 - (cardBackTexture.getWidth() * (numPlayers-1))) / numPlayers) / 2;
 		
+		for(int i = 1; i < numPlayers; i++){
+			targetPositions[i] = new Vector2((i-1) * ((1080 + margin) / (numPlayers - 1)) + margin , MAX_HEIGHT);
+			cardBackSprites[i].setPosition(targetPositions[i].x, targetPositions[i].y);
+		}
 	}
 
 	private void dealAnimation(int numPlayers) {
 		//again, testing with 4 players, needs to be refactored for different amount of players
 		//target positions
-		Vector2 targetUpperLeft = new Vector2(MIN_WIDTH,MAX_HEIGHT);
-		Vector2 targetLowerLeft = new Vector2(MIN_WIDTH,MIN_HEIGHT);
-		Vector2 targetUpperRight = new Vector2(MAX_WIDTH,MAX_HEIGHT);
-		Vector2 targetLowerRight = new Vector2(MAX_WIDTH,MIN_HEIGHT);
+//		Vector2 targetUpperLeft = new Vector2(MIN_WIDTH,MAX_HEIGHT);
+//		Vector2 targetLowerLeft = new Vector2(MIN_WIDTH,MIN_HEIGHT);
+//		Vector2 targetUpperRight = new Vector2(MAX_WIDTH,MAX_HEIGHT);
+//		Vector2 targetLowerRight = new Vector2(MAX_WIDTH,MIN_HEIGHT);
+//		
+//		//movement position
+//		Vector2 movementUpperLeft = new Vector2();
+//		Vector2 movementLowerLeft = new Vector2();
+//		Vector2 movementUpperRight = new Vector2();
+//		Vector2 movementLowerRight = new Vector2();
+//		
+//		//velocity
+//		float xMovement = (65 * Gdx.graphics.getDeltaTime());
+//		float yMovement = (37 * Gdx.graphics.getDeltaTime());
+//		
+//		//For cardBack Upper Left
+//		if(cardBackUL.getX() > targetUpperLeft.x ){
+//			movementUpperLeft.x = cardBackUL.getX() - xMovement;
+//		}
+//		if(cardBackUL.getY() < targetUpperLeft.y) {
+//			movementUpperLeft.y = cardBackUL.getY() + yMovement;
+//		}
+//		cardBackUL.setPosition(movementUpperLeft.x, movementUpperLeft.y);
+//		
+//
+//		//For cardBack Lower Left
+//		if(cardBackLL.getX() > targetLowerLeft.x){
+//			movementLowerLeft.x = cardBackLL.getX() - xMovement;
+//		}
+//		if(cardBackLL.getY() > targetLowerLeft.y){
+//			movementLowerLeft.y = cardBackLL.getY() - yMovement;
+//		}
+//		cardBackLL.setPosition(movementLowerLeft.x, movementLowerLeft.y);
+//		
+//		//For cardBack Upper Right
+//		if(cardBackUR.getX() < targetUpperRight.x){
+//			movementUpperRight.x = cardBackUR.getX() + xMovement;
+//		}
+//		if(cardBackUR.getY() < targetUpperRight.y){
+//			movementUpperRight.y = cardBackUR.getY() + yMovement;
+//		}
+//		cardBackUR.setPosition(movementUpperRight.x, movementUpperRight.y);
+//		
+//		//For cardBack Lower Right
+//		if(cardBackLR.getX() < targetLowerRight.x) {
+//			movementLowerRight.x = cardBackLR.getX() + xMovement;
+//		}
+//		if(cardBackLR.getY() > targetLowerRight.y){
+//			movementLowerRight.y = cardBackLR.getY() - yMovement;
+//		}
+//		cardBackLR.setPosition(movementLowerRight.x, movementLowerRight.y);
+
+
+		//multiple player animations
+		//target positions and movement positions
+		Vector2 targetPositions[] = new Vector2[numPlayers];
+		Vector2 movementPositions[] = new Vector2[numPlayers];
+		int margin = ((1080 - (cardBackTexture.getWidth() * (numPlayers-1))) / numPlayers) / 2;
 		
-		//movement position
-		Vector2 movementUpperLeft = new Vector2();
-		Vector2 movementLowerLeft = new Vector2();
-		Vector2 movementUpperRight = new Vector2();
-		Vector2 movementLowerRight = new Vector2();
+		for(int i = 1; i < numPlayers; i++){
+			targetPositions[i] = new Vector2((i-1) * ((1080 + margin) / (numPlayers - 1)) + margin , MAX_HEIGHT);
+			movementPositions[i] = new Vector2();
+		}
 		
 		//velocity
-		float xMovement = (65 * Gdx.graphics.getDeltaTime());
+		float xMovement = (100 * Gdx.graphics.getDeltaTime());
 		float yMovement = (37 * Gdx.graphics.getDeltaTime());
 		
-		//For cardBack Upper Left
-		if(cardBackUL.getX() > targetUpperLeft.x ){
-			movementUpperLeft.x = cardBackUL.getX() - xMovement;
+		//move the cards
+		for(int i = 1; i < numPlayers; i++){
+			if(cardBackSprites[i].getX() < targetPositions[i].x){
+				movementPositions[i].x = cardBackSprites[i].getX() + xMovement;
+			}
+			else if(cardBackSprites[i].getX() > targetPositions[i].x){
+				movementPositions[i].x = cardBackSprites[i].getX() - xMovement;
+			}
+			
+			if(cardBackSprites[i].getY() < targetPositions[i].y){
+				movementPositions[i].y = cardBackSprites[i].getY() + yMovement;
+			}
+			cardBackSprites[i].setPosition(movementPositions[i].x, movementPositions[i].y);
 		}
-		if(cardBackUL.getY() < targetUpperLeft.y) {
-			movementUpperLeft.y = cardBackUL.getY() + yMovement;
-		}
-		cardBackUL.setPosition(movementUpperLeft.x, movementUpperLeft.y);
-		
-
-		//For cardBack Lower Left
-		if(cardBackLL.getX() > targetLowerLeft.x){
-			movementLowerLeft.x = cardBackLL.getX() - xMovement;
-		}
-		if(cardBackLL.getY() > targetLowerLeft.y){
-			movementLowerLeft.y = cardBackLL.getY() - yMovement;
-		}
-		cardBackLL.setPosition(movementLowerLeft.x, movementLowerLeft.y);
-		
-		//For cardBack Upper Right
-		if(cardBackUR.getX() < targetUpperRight.x){
-			movementUpperRight.x = cardBackUR.getX() + xMovement;
-		}
-		if(cardBackUR.getY() < targetUpperRight.y){
-			movementUpperRight.y = cardBackUR.getY() + yMovement;
-		}
-		cardBackUR.setPosition(movementUpperRight.x, movementUpperRight.y);
-		
-		//For cardBack Lower Right
-		if(cardBackLR.getX() < targetLowerRight.x) {
-			movementLowerRight.x = cardBackLR.getX() + xMovement;
-		}
-		if(cardBackLR.getY() > targetLowerRight.y){
-			movementLowerRight.y = cardBackLR.getY() - yMovement;
-		}
-		cardBackLR.setPosition(movementLowerRight.x, movementLowerRight.y);
 	}
 
 	//Don't delete! Used to clean up at the end
@@ -318,4 +369,3 @@ public class Slapjack extends ApplicationAdapter {
 		return button;
 	}
 }
-
