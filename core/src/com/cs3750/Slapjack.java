@@ -167,8 +167,6 @@ public class Slapjack extends ApplicationAdapter {
 		cardBackUR.draw(batch);
 		cardBackLR.draw(batch);
 		batch.end();
-		Gdx.input.setInputProcessor(stage); 
-		stage.draw();
 		
 		if(gamePhase == GamePhases.TITLE_SCREEN){
 			Gdx.input.setInputProcessor(startStage); 
