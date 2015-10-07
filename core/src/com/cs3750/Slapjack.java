@@ -60,6 +60,8 @@ public class Slapjack extends ApplicationAdapter {
 	
 	private HashMap<String, Runnable> buttonMap = new HashMap<String, Runnable>();
 	private TextButton playCardButton;
+	private TextButton startGameButton;
+	private TextButton resetGameButton;
 	
 	//Don't delete!
 	@Override
@@ -100,11 +102,13 @@ public class Slapjack extends ApplicationAdapter {
 		MIN_WIDTH = 175;
 		
 		//button style
+		Texture buttonTexture = new Texture(Gdx.files.internal("button.png"));
+		Texture buttonDownTexture = new Texture(Gdx.files.internal("buttonDown.png"));
 		bitmapfont = new BitmapFont();
 		skin = new Skin();
 		skin.add("default", bitmapfont);
-		skin.add("buttonUp", new Texture(Gdx.files.internal("button.png")));
-		skin.add("buttonDown", new Texture(Gdx.files.internal("buttonDown.png")));
+		skin.add("buttonUp", buttonTexture);
+		skin.add("buttonDown", buttonDownTexture);
 		
 		textButtonStyle = new TextButtonStyle();
 		textButtonStyle.up = skin.newDrawable("buttonUp");
@@ -113,10 +117,21 @@ public class Slapjack extends ApplicationAdapter {
 		
 		//create buttons
 		//TODO second argument needs dynamic width for the width of the button, right now it is hard coded at 110
-		playCardButton = getButton("Play Game", (Gdx.graphics.getWidth()-110)/2, 75, "playCardButton", textButtonStyle);
+		playCardButton = getButton("Play Card", (Gdx.graphics.getWidth()-buttonTexture.getWidth())/2, 75, "playCardButton", textButtonStyle);
+		startGameButton = getButton("Start", (Gdx.graphics.getWidth()-buttonTexture.getWidth())/2, 75, "startGameButton", textButtonStyle);
+		resetGameButton = getButton("Reset", (Gdx.graphics.getWidth()-buttonTexture.getWidth())/2, 75, "resetGameButton", textButtonStyle);
 		
 		//add buttons to map
 		buttonMap.put("playCardButton", new Runnable(){
+			public void run() {
+				//method called when the button is clicked
+				//the line below was part of a merge conflict
+				//deck.add(player1.playCard());
+				//gamePhase = GamePhases.DEAL;
+				//playGame();
+			}
+		});
+		buttonMap.put("startGameButton", new Runnable(){
 			public void run() {
 				//method called when the button is clicked
 				//the line below was part of a merge conflict
@@ -125,9 +140,16 @@ public class Slapjack extends ApplicationAdapter {
 				playGame();
 			}
 		});
+		buttonMap.put("resetGameButton", new Runnable(){
+			public void run() {
+				//method called when the button is clicked
+			}
+		});
 		
 		//add actors to stage
+		startStage.addActor(startGameButton);
 		stage.addActor(playCardButton);
+		endStage.addActor(resetGameButton);
 	}
 
 	//Don't delete! Used for drawing on the screen
@@ -148,7 +170,8 @@ public class Slapjack extends ApplicationAdapter {
 		stage.draw();
 		
 		if(gamePhase == GamePhases.TITLE_SCREEN){
-			
+			Gdx.input.setInputProcessor(startStage); 
+			startStage.draw();
 		} 
 		
 		if(gamePhase == GamePhases.DEAL && timer >= 4){
@@ -161,11 +184,13 @@ public class Slapjack extends ApplicationAdapter {
 		}
 		
 		if(gamePhase == GamePhases.GAME_PLAY){
-			
+			Gdx.input.setInputProcessor(stage); 
+			stage.draw();
 		}
 		
 		if(gamePhase == GamePhases.WINNER){
-			
+			Gdx.input.setInputProcessor(endStage); 
+			endStage.draw();
 		}
 	}
 	
