@@ -14,6 +14,7 @@ import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.ParticleEffect;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
@@ -32,8 +33,22 @@ public class Slapjack extends ApplicationAdapter {
 	private SpriteBatch batch;
 	private Texture background;	
 	private Texture cardSpriteSheet;
+	
+	//for cardback animations
 	private Texture cardBackTexture;
 	private Sprite cardBack;
+	private Sprite cardBackUL;
+	private Sprite cardBackLL;
+	private Sprite cardBackUR;
+	private Sprite cardBackLR;
+	private float timer = 0f;
+	private int MAX_HEIGHT;
+	private int MIN_HEIGHT; 
+	private int MAX_WIDTH; 
+	private int MIN_WIDTH;
+	private int numPlayers;
+	
+	
 	
 	private Stage startStage;
 	private Stage stage;
@@ -49,6 +64,10 @@ public class Slapjack extends ApplicationAdapter {
 	//Don't delete!
 	@Override
 	public void create () {	
+		
+		//environment variables
+		numPlayers = 4;
+		
 		batch = new SpriteBatch();
 		
 		//background
@@ -66,6 +85,19 @@ public class Slapjack extends ApplicationAdapter {
 		cardBackTexture = new Texture(Gdx.files.internal("cardback.png"));
 		cardBack = new Sprite(cardBackTexture);
 		cardBack.setPosition((Gdx.graphics.getWidth()-cardBack.getWidth())/2, (Gdx.graphics.getHeight()-cardBack.getHeight())/2);
+		cardBackUL = new Sprite(cardBackTexture);
+		cardBackUL.setPosition((Gdx.graphics.getWidth()-cardBack.getWidth())/2, (Gdx.graphics.getHeight()-cardBack.getHeight())/2);
+		cardBackLL = new Sprite(cardBackTexture);
+		cardBackLL.setPosition((Gdx.graphics.getWidth()-cardBack.getWidth())/2, (Gdx.graphics.getHeight()-cardBack.getHeight())/2);
+		cardBackUR = new Sprite(cardBackTexture);
+		cardBackUR.setPosition((Gdx.graphics.getWidth()-cardBack.getWidth())/2, (Gdx.graphics.getHeight()-cardBack.getHeight())/2);
+		cardBackLR = new Sprite(cardBackTexture);
+		cardBackLR.setPosition((Gdx.graphics.getWidth()-cardBack.getWidth())/2, (Gdx.graphics.getHeight()-cardBack.getHeight())/2);
+		
+		MAX_HEIGHT = Gdx.graphics.getHeight()-215;
+		MIN_HEIGHT = 75;
+		MAX_WIDTH = Gdx.graphics.getWidth()-300;
+		MIN_WIDTH = 175;
 		
 		//button style
 		bitmapfont = new BitmapFont();
@@ -89,6 +121,7 @@ public class Slapjack extends ApplicationAdapter {
 				//method called when the button is clicked
 				//the line below was part of a merge conflict
 				//deck.add(player1.playCard());
+				gamePhase = GamePhases.DEAL;
 				playGame();
 			}
 		});
@@ -105,26 +138,108 @@ public class Slapjack extends ApplicationAdapter {
 		
 		batch.begin();
 		batch.draw(background, 0, 0);
-		cardBack.draw(batch);
+		//cardBack.draw(batch);
+		cardBackUL.draw(batch);
+		cardBackLL.draw(batch);
+		cardBackUR.draw(batch);
+		cardBackLR.draw(batch);
 		batch.end();
 		Gdx.input.setInputProcessor(stage); 
 		stage.draw();
 		
 		if(gamePhase == GamePhases.TITLE_SCREEN){
 			
-			gamePhase = GamePhases.DEAL;
 		} 
-		else if(gamePhase == GamePhases.DEAL){
+		
+		if(gamePhase == GamePhases.DEAL && timer >= 4){
+			//stopDealAnimation();
+			timer = 0f;
+			gamePhase = GamePhases.GAME_PLAY;
+		}else if(gamePhase == GamePhases.DEAL){
+			dealAnimation(numPlayers);
+			timer += Gdx.graphics.getDeltaTime();
+		}
+		
+		if(gamePhase == GamePhases.GAME_PLAY){
 			
 		}
-		else if(gamePhase == GamePhases.GAME_PLAY){
-			
-		}
-		else if(gamePhase == GamePhases.WINNER){
+		
+		if(gamePhase == GamePhases.WINNER){
 			
 		}
 	}
 	
+	private void stopDealAnimation() {
+		//again, testing with 4 players, needs to be refactored for different amount of players		
+		//target positions
+		Vector2 targetUpperLeft = new Vector2(MIN_WIDTH,MAX_HEIGHT);
+		Vector2 targetLowerLeft = new Vector2(MIN_WIDTH,MIN_HEIGHT);
+		Vector2 targetUpperRight = new Vector2(MAX_WIDTH,MAX_HEIGHT);
+		Vector2 targetLowerRight = new Vector2(MAX_WIDTH,MIN_HEIGHT);
+		
+		cardBackUL.setPosition(targetUpperLeft.x, targetUpperLeft.y);
+		cardBackLL.setPosition(targetLowerLeft.x, targetLowerLeft.y);
+		cardBackUR.setPosition(targetUpperRight.x, targetUpperRight.y);
+		cardBackLR.setPosition(targetLowerRight.x, targetLowerRight.y);
+		
+	}
+
+	private void dealAnimation(int numPlayers) {
+		//again, testing with 4 players, needs to be refactored for different amount of players
+		//target positions
+		Vector2 targetUpperLeft = new Vector2(MIN_WIDTH,MAX_HEIGHT);
+		Vector2 targetLowerLeft = new Vector2(MIN_WIDTH,MIN_HEIGHT);
+		Vector2 targetUpperRight = new Vector2(MAX_WIDTH,MAX_HEIGHT);
+		Vector2 targetLowerRight = new Vector2(MAX_WIDTH,MIN_HEIGHT);
+		
+		//movement position
+		Vector2 movementUpperLeft = new Vector2();
+		Vector2 movementLowerLeft = new Vector2();
+		Vector2 movementUpperRight = new Vector2();
+		Vector2 movementLowerRight = new Vector2();
+		
+		//velocity
+		float xMovement = (65 * Gdx.graphics.getDeltaTime());
+		float yMovement = (37 * Gdx.graphics.getDeltaTime());
+		
+		//For cardBack Upper Left
+		if(cardBackUL.getX() > targetUpperLeft.x ){
+			movementUpperLeft.x = cardBackUL.getX() - xMovement;
+		}
+		if(cardBackUL.getY() < targetUpperLeft.y) {
+			movementUpperLeft.y = cardBackUL.getY() + yMovement;
+		}
+		cardBackUL.setPosition(movementUpperLeft.x, movementUpperLeft.y);
+		
+
+		//For cardBack Lower Left
+		if(cardBackLL.getX() > targetLowerLeft.x){
+			movementLowerLeft.x = cardBackLL.getX() - xMovement;
+		}
+		if(cardBackLL.getY() > targetLowerLeft.y){
+			movementLowerLeft.y = cardBackLL.getY() - yMovement;
+		}
+		cardBackLL.setPosition(movementLowerLeft.x, movementLowerLeft.y);
+		
+		//For cardBack Upper Right
+		if(cardBackUR.getX() < targetUpperRight.x){
+			movementUpperRight.x = cardBackUR.getX() + xMovement;
+		}
+		if(cardBackUR.getY() < targetUpperRight.y){
+			movementUpperRight.y = cardBackUR.getY() + yMovement;
+		}
+		cardBackUR.setPosition(movementUpperRight.x, movementUpperRight.y);
+		
+		//For cardBack Lower Right
+		if(cardBackLR.getX() < targetLowerRight.x) {
+			movementLowerRight.x = cardBackLR.getX() + xMovement;
+		}
+		if(cardBackLR.getY() > targetLowerRight.y){
+			movementLowerRight.y = cardBackLR.getY() - yMovement;
+		}
+		cardBackLR.setPosition(movementLowerRight.x, movementLowerRight.y);
+	}
+
 	//Don't delete! Used to clean up at the end
 	@Override
 	public void dispose() {
