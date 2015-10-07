@@ -72,6 +72,7 @@ public class Slapjack extends ApplicationAdapter {
 		buttonMap.put("playCardButton", new Runnable(){
 			public void run() {
 				//method called when the button is clicked
+				deck.add(player1.playCard());
 			}
 		});
 		
@@ -123,11 +124,10 @@ public class Slapjack extends ApplicationAdapter {
 		player1.addToHand(deck.deal(numPlayers));
 		player2.addToHand(deck.deal(numPlayers));
 		player3.addToHand(deck.deal(numPlayers));
-		player4.addToHand(deck.deal(numPlayers));
-		
-		
+		player4.addToHand(deck.deal(numPlayers));	
 		
 	}
+	
 	
 	//this method is used to create a button
 	private TextButton getButton(String buttonText, int xPosition,
