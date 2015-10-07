@@ -24,10 +24,8 @@ import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton.TextButtonStyle;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 
-
-
 public class Slapjack extends ApplicationAdapter {
-	public enum GamePhases{ TITLE_SCREEN, DEAL, GAME_PLAY, WINNER } 
+	public enum GamePhases{ TITLE_SCREEN, DEAL, GAME_PLAY, WINNER }
 	private GamePhases gamePhase = GamePhases.TITLE_SCREEN;
 	
 	private SpriteBatch batch;
@@ -47,8 +45,8 @@ public class Slapjack extends ApplicationAdapter {
 	private int MAX_WIDTH; 
 	private int MIN_WIDTH;
 	private int numPlayers;
-	
-	
+	private static boolean jackPlayed = false;
+	private List<Card> cardsPlayed;
 	
 	private Stage startStage;
 	private Stage stage;
@@ -66,7 +64,7 @@ public class Slapjack extends ApplicationAdapter {
 	public void create () {	
 		
 		//environment variables
-		numPlayers = 4;
+		numPlayers = 4;		
 		
 		batch = new SpriteBatch();
 		
@@ -147,6 +145,8 @@ public class Slapjack extends ApplicationAdapter {
 		Gdx.input.setInputProcessor(stage); 
 		stage.draw();
 		
+		boolean jackPlayed;
+		
 		if(gamePhase == GamePhases.TITLE_SCREEN){
 			
 		} 
@@ -161,7 +161,10 @@ public class Slapjack extends ApplicationAdapter {
 		}
 		
 		if(gamePhase == GamePhases.GAME_PLAY){
-			
+			Card currCard = cardsPlayed.get(cardsPlayed.size() - 1);
+			if(currCard.getRank() == "JACK"){
+				jackPlayed = true;
+			}
 		}
 		
 		if(gamePhase == GamePhases.WINNER){
@@ -256,7 +259,7 @@ public class Slapjack extends ApplicationAdapter {
 		// create the deck
 		Deck deck = new Deck(cardSpriteSheet);
 		deck.shuffle();
-		
+				
 		//deal deck out to players
 		//for now there will be four players
 		//can make it more dynamic, more or less players, if we want
@@ -286,7 +289,6 @@ public class Slapjack extends ApplicationAdapter {
 		player.revealHand();
 	}
 	
-	
 	//this method is used to create a button
 	private TextButton getButton(String buttonText, int xPosition,
 			int yPosition, final String id, TextButtonStyle textButtonStyle) {
@@ -300,5 +302,15 @@ public class Slapjack extends ApplicationAdapter {
 		});
 		return button;
 	}
+
+	public static boolean isJackPlayed() {
+		return jackPlayed;
+	}
+
+	public void setJackPlayed(boolean jackPlayed) {
+		this.jackPlayed = jackPlayed;
+	}
+	
+	
 }
 

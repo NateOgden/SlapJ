@@ -1,6 +1,7 @@
 package com.cs3750;
 
 import java.util.ArrayList;
+import java.util.List;
 
 public class Player {
 	private static final int NUMBER_OF_STACKS = 1;
@@ -30,21 +31,30 @@ public class Player {
 		}
 	}
 		
-	private void slap(Card card) {
-		if(canSlapIn /*&& card is Jack*/)
-		{
-			//player.slap();
+	private boolean slap(Card card) {	
+		if(Slapjack.isJackPlayed() && card.getRank() != "JACK" && hand.isEmpty())
+			canSlapIn = false;
+		return canSlapIn;
+	}
+	
+	private ArrayList<Card> giveUpCard(Card card){
+		ArrayList<Card> temp = new ArrayList<Card>();
+		if(card.getRank() != "JACK") {
+			if(!hand.isEmpty()) {
+				temp.add(hand.get(0));
+				hand.remove(0);
+			}
 		}
+		return temp;
 	}
 	
-
-	
-	private void giveUpCard(Card card){
-		
-	}
-	
-	private void playCard(Card card){
-		
+	private ArrayList<Card> playCard(){
+		ArrayList<Card> temp = new ArrayList<Card>();
+		if(!hand.isEmpty()) {
+			temp.add(hand.get(0));
+			hand.remove(0);
+		} 
+		return temp;
 	}
 	
 	private void winGame() {

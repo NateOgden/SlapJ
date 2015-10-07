@@ -15,7 +15,6 @@ public class Deck {
 	
 	ArrayList<Card> deck = new ArrayList<Card>();
 	private static int DECK_SIZE = 52;
-	
 	private final Sprite[] cardSprites;
 	
 	public Deck(Texture cardTexture) {
