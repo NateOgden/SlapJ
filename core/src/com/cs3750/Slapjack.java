@@ -353,7 +353,6 @@ public class Slapjack extends ApplicationAdapter {
 		});
 		return button;
 	}
-<<<<<<< HEAD
 	
 	//Getter/Setter to see if a jack has been played. Helps manage the slap method.
 	public static boolean isJackPlayed() {
@@ -362,11 +361,6 @@ public class Slapjack extends ApplicationAdapter {
 
 	public void setJackPlayed(boolean jackPlayed) {
 		this.jackPlayed = jackPlayed;
-	}
-	
+	}	
 	
 }
-
-=======
-}
->>>>>>> origin/master
