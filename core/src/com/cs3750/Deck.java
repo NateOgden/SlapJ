@@ -12,39 +12,47 @@ import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 
 public class Deck {
-	List<Card> cards = new ArrayList<Card>();
-	ArrayList<Card> playerHand = new ArrayList<Card>();
 	
-	public Deck(Texture cardSpriteSheet){
-		TextureRegion[][] cardTextureRegion = TextureRegion.split(cardSpriteSheet, cardSpriteSheet.getWidth()/13, cardSpriteSheet.getHeight()/4);
-		
+	ArrayList<Card> deck = new ArrayList<Card>();
+	//ArrayList<Card> playerHand = new ArrayList<Card>();
+	private static int DECK_SIZE = 52;
+	
+	private final Sprite[] cardSprites;
+	
+	public Deck(Texture cardTexture) {
+		cardSprites = new Sprite[52];
+		TextureRegion[][] tmp = TextureRegion.split(cardTexture, cardTexture.getWidth()/13, cardTexture.getHeight()/4);
 		for (int i = 0; i < 4; i++){
 			for (int j = 0; j < 13; j++){
-				Sprite sprite = new Sprite(cardTextureRegion[i][j], 0, 0, cardSpriteSheet.getWidth()/13, cardSpriteSheet.getHeight()/4);
-				Card card = new Card(i, sprite);
-				cards.add(card);
+				Sprite sprite = new Sprite(tmp[i][j], 1, 1, cardTexture.getWidth()/13-1, cardTexture.getHeight()/4-1);
+				Card card = new Card(i, j, sprite);
+				deck.add(card);			
 			}
 		}
+		
 	}
 
 	public void shuffle(){
 		long seed = System.nanoTime();
-		Collections.shuffle(cards, new Random(seed));
+		Collections.shuffle(deck, new Random(seed));
+	}
+	
+	public ArrayList<Card> deal(int numPlayers) {
+		//for testing there are four players, giving each player 13 cards
+		int dealOut = DECK_SIZE/numPlayers;
+		ArrayList<Card> playerHand = new ArrayList<Card>();
+		for(int i=0; i < dealOut; i++) {
+			playerHand.add(deck.get(i));
+			deck.remove(i);
+		}
+		return playerHand;
 	}
 	
 	public Card getTopCard(){
-		return cards.remove(0);
+		return deck.remove(0);
 	}
 	
 	public void addAll(Collection <? extends Card> collection){
-		cards.addAll(collection);
+		deck.addAll(collection);
 	}	
-		
-	public ArrayList<Card> dealCardsToPlayers(int numOfPlayers){
-		
-		for(int i = 1; i < numOfPlayers + 1; i++){
-
-		}
-		return playerHand;
-	} 
 }

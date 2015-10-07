@@ -3,9 +3,24 @@ package com.cs3750;
 import java.util.ArrayList;
 
 public class Player {
-	//private slapJack[] centerStack;
 	private static final int NUMBER_OF_STACKS = 1;
-	private boolean canSlapIn = true;
+	private boolean canSlapIn;
+	private ArrayList<Card> hand; 
+	
+	public Player(){
+		hand = new ArrayList<Card>();
+		canSlapIn = true;
+	}
+	
+	public void addToHand(Card card) {
+		hand.add(card);
+	}
+	
+	public void addToHand(ArrayList<Card> stack) {
+		for (Card card : stack) {
+			addToHand(card);
+		}
+	}
 		
 	private void slap(Card card) {
 		if(canSlapIn /*&& card is Jack*/)
@@ -14,9 +29,7 @@ public class Player {
 		}
 	}
 	
-	private void pickUpStack(Card card){
-		
-	}
+
 	
 	private void giveUpCard(Card card){
 		
