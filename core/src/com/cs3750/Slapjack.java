@@ -12,6 +12,7 @@ import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.ParticleEffect;
+import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.Stage;
@@ -25,10 +26,14 @@ import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 
 
 public class Slapjack extends ApplicationAdapter {
+	public enum GamePhases{ TITLE_SCREEN, DEAL, GAME_PLAY, WINNER } 
+	private GamePhases gamePhase = GamePhases.TITLE_SCREEN;
+	
 	private SpriteBatch batch;
 	private Texture background;	
 	private Texture cardSpriteSheet;
-	private Deck deck;
+	private Texture cardBackTexture;
+	private Sprite cardBack;
 	
 	private Stage startStage;
 	private Stage stage;
@@ -45,13 +50,22 @@ public class Slapjack extends ApplicationAdapter {
 	@Override
 	public void create () {	
 		batch = new SpriteBatch();
-		background = new Texture(Gdx.files.internal("rustic_background.jpg"));
-		cardSpriteSheet = new Texture(Gdx.files.internal("sprite_deck.png"));
-		deck = new Deck(cardSpriteSheet);
 		
+		//background
+		background = new Texture(Gdx.files.internal("rustic_background.jpg"));
+		
+		//cardSpriteSheet
+		cardSpriteSheet = new Texture(Gdx.files.internal("sprite_deck.png"));
+
+		//Stage
 		startStage = new Stage();
 		stage = new Stage();
 		endStage = new Stage();
+		
+		//cardBack 
+		cardBackTexture = new Texture(Gdx.files.internal("cardback.png"));
+		cardBack = new Sprite(cardBackTexture);
+		cardBack.setPosition((Gdx.graphics.getWidth()-cardBack.getWidth())/2, (Gdx.graphics.getHeight()-cardBack.getHeight())/2);
 		
 		//button style
 		bitmapfont = new BitmapFont();
@@ -66,12 +80,14 @@ public class Slapjack extends ApplicationAdapter {
 		textButtonStyle.font = skin.getFont("default");
 		
 		//create buttons
-		playCardButton = getButton("Play Card", (Gdx.graphics.getWidth())/2, 75, "playCardButton", textButtonStyle);
+		//TODO second argument needs dynamic width for the width of the button, right now it is hard coded at 110
+		playCardButton = getButton("Play Game", (Gdx.graphics.getWidth()-110)/2, 75, "playCardButton", textButtonStyle);
 		
 		//add buttons to map
 		buttonMap.put("playCardButton", new Runnable(){
 			public void run() {
 				//method called when the button is clicked
+				playGame();
 			}
 		});
 		
@@ -87,9 +103,24 @@ public class Slapjack extends ApplicationAdapter {
 		
 		batch.begin();
 		batch.draw(background, 0, 0);
+		cardBack.draw(batch);
 		batch.end();
 		Gdx.input.setInputProcessor(stage); 
 		stage.draw();
+		
+		if(gamePhase == GamePhases.TITLE_SCREEN){
+			
+			gamePhase = GamePhases.DEAL;
+		} 
+		else if(gamePhase == GamePhases.DEAL){
+			
+		}
+		else if(gamePhase == GamePhases.GAME_PLAY){
+			
+		}
+		else if(gamePhase == GamePhases.WINNER){
+			
+		}
 	}
 	
 	//Don't delete! Used to clean up at the end
@@ -125,8 +156,17 @@ public class Slapjack extends ApplicationAdapter {
 		player3.addToHand(deck.deal(numPlayers));
 		player4.addToHand(deck.deal(numPlayers));
 		
-		
-		
+		/*
+		testWhatDoesPlayerHave(player1);
+		testWhatDoesPlayerHave(player2);
+		testWhatDoesPlayerHave(player3);
+		testWhatDoesPlayerHave(player4);
+		*/
+	}
+	
+	public void testWhatDoesPlayerHave(Player player) {
+		System.out.println(player.toString() + " has the following cards:");
+		player.revealHand();
 	}
 	
 	//this method is used to create a button

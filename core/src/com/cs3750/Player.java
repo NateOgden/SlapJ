@@ -21,6 +21,14 @@ public class Player {
 			addToHand(card);
 		}
 	}
+	
+	public void revealHand() {
+		for (Card card : hand) {
+			String rank = card.getRank().toString();
+			String suit = card.getSuit().toString();
+			System.out.println(rank + " of " + suit);
+		}
+	}
 		
 	private void slap(Card card) {
 		if(canSlapIn /*&& card is Jack*/)
