@@ -42,7 +42,6 @@ public class Card {
 		return (int)sprite.getWidth();
 	}
 	
-	// Probably not needed 
 	public String getSuit() {
 		return suit.toString();
 	}
