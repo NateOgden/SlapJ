@@ -30,6 +30,8 @@ public class Slapjack extends ApplicationAdapter {
 	public enum GamePhases{ TITLE_SCREEN, DEAL, GAME_PLAY, WINNER } 
 	private GamePhases gamePhase = GamePhases.TITLE_SCREEN;
 	
+	private ArrayList<Player> players;
+	
 	private SpriteBatch batch;
 	private Texture background;	
 	private Texture cardSpriteSheet;
@@ -48,8 +50,6 @@ public class Slapjack extends ApplicationAdapter {
 	private int MIN_WIDTH;
 	private int numPlayers;
 	
-	
-	
 	private Stage startStage;
 	private Stage stage;
 	private Stage endStage;
@@ -67,6 +67,7 @@ public class Slapjack extends ApplicationAdapter {
 		
 		//environment variables
 		numPlayers = 4;
+		players = new ArrayList<Player>();
 		
 		batch = new SpriteBatch();
 		
@@ -258,27 +259,20 @@ public class Slapjack extends ApplicationAdapter {
 		deck.shuffle();
 		
 		//deal deck out to players
-		//for now there will be four players
-		//can make it more dynamic, more or less players, if we want
-		//but for the sake of testing now, I will create four players
-		Player player1 = new Player();
-		Player player2 = new Player();
-		Player player3 = new Player();
-		Player player4 = new Player();
+		for(int i = 0; i < numPlayers; i++){
+			players.add(new Player());
+		}
+			
 		
-		//each player gets a hand of cards
-		int numPlayers = 4;
-		player1.addToHand(deck.deal(numPlayers));
-		player2.addToHand(deck.deal(numPlayers));
-		player3.addToHand(deck.deal(numPlayers));
-		player4.addToHand(deck.deal(numPlayers));	
+		for(Player player : players){
+			player.addToHand(deck.deal(numPlayers));;
+		}
 	
-		/*
-		testWhatDoesPlayerHave(player1);
-		testWhatDoesPlayerHave(player2);
-		testWhatDoesPlayerHave(player3);
-		testWhatDoesPlayerHave(player4);
-		*/
+		//for testing 
+		for(Player player : players){
+			testWhatDoesPlayerHave(player);
+		}
+
 	}
 	
 	public void testWhatDoesPlayerHave(Player player) {
