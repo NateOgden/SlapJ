@@ -362,5 +362,4 @@ public class Slapjack extends ApplicationAdapter {
 	public void setJackPlayed(boolean jackPlayed) {
 		this.jackPlayed = jackPlayed;
 	}	
-	
 }
