@@ -28,18 +28,17 @@ public class Slapjack extends ApplicationAdapter {
 	public enum GamePhases{ TITLE_SCREEN, DEAL, GAME_PLAY, WINNER }
 	private GamePhases gamePhase = GamePhases.TITLE_SCREEN;
 	
+	//for dynamic amount of players 
+	private ArrayList<Player> players;
+	private ArrayList<Card> cardStack;
+
 	private SpriteBatch batch;
 	private Texture background;	
 	private Texture cardSpriteSheet;
 	
-	//for cardback animations
+	//for card back animations
 	private Sprite[] cardBackSprites;
 	private Texture cardBackTexture;
-	private Sprite cardBack;
-	private Sprite cardBackUL;
-	private Sprite cardBackLL;
-	private Sprite cardBackUR;
-	private Sprite cardBackLR;
 	private float timer = 0f;
 	private int MAX_HEIGHT;
 	private int MIN_HEIGHT; 
@@ -65,7 +64,9 @@ public class Slapjack extends ApplicationAdapter {
 	public void create () {	
 		
 		//environment variables
-		numPlayers = 4;		
+		numPlayers = 7;
+		players = new ArrayList<Player>();
+		cardStack = new ArrayList<Card>();
 		
 		batch = new SpriteBatch();
 		
@@ -88,18 +89,7 @@ public class Slapjack extends ApplicationAdapter {
 			cardBackSprites[i] = new Sprite(cardBackTexture);
 			cardBackSprites[i].setPosition((Gdx.graphics.getWidth()-cardBackSprites[i].getWidth())/2, (Gdx.graphics.getHeight()-cardBackSprites[i].getHeight())/2);
 		}
-		
-//		cardBack = new Sprite(cardBackTexture);
-//		cardBack.setPosition((Gdx.graphics.getWidth()-cardBack.getWidth())/2, (Gdx.graphics.getHeight()-cardBack.getHeight())/2);
-//		cardBackUL = new Sprite(cardBackTexture);
-//		cardBackUL.setPosition((Gdx.graphics.getWidth()-cardBack.getWidth())/2, (Gdx.graphics.getHeight()-cardBack.getHeight())/2);
-//		cardBackLL = new Sprite(cardBackTexture);
-//		cardBackLL.setPosition((Gdx.graphics.getWidth()-cardBack.getWidth())/2, (Gdx.graphics.getHeight()-cardBack.getHeight())/2);
-//		cardBackUR = new Sprite(cardBackTexture);
-//		cardBackUR.setPosition((Gdx.graphics.getWidth()-cardBack.getWidth())/2, (Gdx.graphics.getHeight()-cardBack.getHeight())/2);
-//		cardBackLR = new Sprite(cardBackTexture);
-//		cardBackLR.setPosition((Gdx.graphics.getWidth()-cardBack.getWidth())/2, (Gdx.graphics.getHeight()-cardBack.getHeight())/2);
-		
+			
 		MAX_HEIGHT = Gdx.graphics.getHeight()-215;
 		MIN_HEIGHT = 75;
 		MAX_WIDTH = Gdx.graphics.getWidth()-300;
@@ -144,12 +134,6 @@ public class Slapjack extends ApplicationAdapter {
 		
 		batch.begin();
 		batch.draw(background, 0, 0);
-		//cardBack.draw(batch);
-//		cardBackUL.draw(batch);
-//		cardBackLL.draw(batch);
-//		cardBackUR.draw(batch);
-//		cardBackLR.draw(batch);
-
 		for(Sprite s: cardBackSprites){
 			s.draw(batch);
 		}
@@ -163,7 +147,7 @@ public class Slapjack extends ApplicationAdapter {
 			
 		} 
 		
-		if(gamePhase == GamePhases.DEAL && timer >= 4){
+		if(gamePhase == GamePhases.DEAL && timer >= 4.5){
 			stopDealAnimation();
 			timer = 0f;
 			gamePhase = GamePhases.GAME_PLAY;
@@ -173,10 +157,10 @@ public class Slapjack extends ApplicationAdapter {
 		}
 		
 		if(gamePhase == GamePhases.GAME_PLAY){
-			Card currCard = cardsPlayed.get(cardsPlayed.size() - 1);
-			if(currCard.getRank() == "JACK"){
-				jackPlayed = true;
-			}
+//			Card currCard = cardsPlayed.get(cardsPlayed.size() - 1);
+//			if(currCard.getRank() == "JACK"){
+//				jackPlayed = true;
+//			}
 		}
 		
 		if(gamePhase == GamePhases.WINNER){
@@ -184,19 +168,7 @@ public class Slapjack extends ApplicationAdapter {
 		}
 	}
 	
-	private void stopDealAnimation() {
-		//again, testing with 4 players, needs to be refactored for different amount of players		
-		//target positions
-//		Vector2 targetUpperLeft = new Vector2(MIN_WIDTH,MAX_HEIGHT);
-//		Vector2 targetLowerLeft = new Vector2(MIN_WIDTH,MIN_HEIGHT);
-//		Vector2 targetUpperRight = new Vector2(MAX_WIDTH,MAX_HEIGHT);
-//		Vector2 targetLowerRight = new Vector2(MAX_WIDTH,MIN_HEIGHT);
-//		
-//		cardBackUL.setPosition(targetUpperLeft.x, targetUpperLeft.y);
-//		cardBackLL.setPosition(targetLowerLeft.x, targetLowerLeft.y);
-//		cardBackUR.setPosition(targetUpperRight.x, targetUpperRight.y);
-//		cardBackLR.setPosition(targetLowerRight.x, targetLowerRight.y);
-		
+	private void stopDealAnimation() {		
 		//multiple player animations
 		Vector2 targetPositions[] = new Vector2[numPlayers];
 		int margin = ((1080 - (cardBackTexture.getWidth() * (numPlayers-1))) / numPlayers) / 2;
@@ -208,61 +180,6 @@ public class Slapjack extends ApplicationAdapter {
 	}
 
 	private void dealAnimation(int numPlayers) {
-		//again, testing with 4 players, needs to be refactored for different amount of players
-		//target positions
-//		Vector2 targetUpperLeft = new Vector2(MIN_WIDTH,MAX_HEIGHT);
-//		Vector2 targetLowerLeft = new Vector2(MIN_WIDTH,MIN_HEIGHT);
-//		Vector2 targetUpperRight = new Vector2(MAX_WIDTH,MAX_HEIGHT);
-//		Vector2 targetLowerRight = new Vector2(MAX_WIDTH,MIN_HEIGHT);
-//		
-//		//movement position
-//		Vector2 movementUpperLeft = new Vector2();
-//		Vector2 movementLowerLeft = new Vector2();
-//		Vector2 movementUpperRight = new Vector2();
-//		Vector2 movementLowerRight = new Vector2();
-//		
-//		//velocity
-//		float xMovement = (65 * Gdx.graphics.getDeltaTime());
-//		float yMovement = (37 * Gdx.graphics.getDeltaTime());
-//		
-//		//For cardBack Upper Left
-//		if(cardBackUL.getX() > targetUpperLeft.x ){
-//			movementUpperLeft.x = cardBackUL.getX() - xMovement;
-//		}
-//		if(cardBackUL.getY() < targetUpperLeft.y) {
-//			movementUpperLeft.y = cardBackUL.getY() + yMovement;
-//		}
-//		cardBackUL.setPosition(movementUpperLeft.x, movementUpperLeft.y);
-//		
-//
-//		//For cardBack Lower Left
-//		if(cardBackLL.getX() > targetLowerLeft.x){
-//			movementLowerLeft.x = cardBackLL.getX() - xMovement;
-//		}
-//		if(cardBackLL.getY() > targetLowerLeft.y){
-//			movementLowerLeft.y = cardBackLL.getY() - yMovement;
-//		}
-//		cardBackLL.setPosition(movementLowerLeft.x, movementLowerLeft.y);
-//		
-//		//For cardBack Upper Right
-//		if(cardBackUR.getX() < targetUpperRight.x){
-//			movementUpperRight.x = cardBackUR.getX() + xMovement;
-//		}
-//		if(cardBackUR.getY() < targetUpperRight.y){
-//			movementUpperRight.y = cardBackUR.getY() + yMovement;
-//		}
-//		cardBackUR.setPosition(movementUpperRight.x, movementUpperRight.y);
-//		
-//		//For cardBack Lower Right
-//		if(cardBackLR.getX() < targetLowerRight.x) {
-//			movementLowerRight.x = cardBackLR.getX() + xMovement;
-//		}
-//		if(cardBackLR.getY() > targetLowerRight.y){
-//			movementLowerRight.y = cardBackLR.getY() - yMovement;
-//		}
-//		cardBackLR.setPosition(movementLowerRight.x, movementLowerRight.y);
-
-
 		//multiple player animations
 		//target positions and movement positions
 		Vector2 targetPositions[] = new Vector2[numPlayers];
@@ -312,27 +229,16 @@ public class Slapjack extends ApplicationAdapter {
 		deck.shuffle();
 				
 		//deal deck out to players
-		//for now there will be four players
-		//can make it more dynamic, more or less players, if we want
-		//but for the sake of testing now, I will create four players
-		Player player1 = new Player();
-		Player player2 = new Player();
-		Player player3 = new Player();
-		Player player4 = new Player();
 		
-		//each player gets a hand of cards
-		int numPlayers = 4;
-		player1.addToHand(deck.deal(numPlayers));
-		player2.addToHand(deck.deal(numPlayers));
-		player3.addToHand(deck.deal(numPlayers));
-		player4.addToHand(deck.deal(numPlayers));	
-	
-		/*
-		testWhatDoesPlayerHave(player1);
-		testWhatDoesPlayerHave(player2);
-		testWhatDoesPlayerHave(player3);
-		testWhatDoesPlayerHave(player4);
-		*/
+		for(int i = 0; i < numPlayers; i++){
+			players.add(new Player());
+		}
+		
+		deck.deal(players);
+		
+		for (Player player : players){
+			testWhatDoesPlayerHave(player);
+		}
 	}
 	
 	public void testWhatDoesPlayerHave(Player player) {

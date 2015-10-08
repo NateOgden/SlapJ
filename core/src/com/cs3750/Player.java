@@ -48,6 +48,7 @@ public class Player {
 		return temp;
 	}
 	
+
 	private ArrayList<Card> playCard(){
 		ArrayList<Card> temp = new ArrayList<Card>();
 		if(!hand.isEmpty()) {
@@ -55,6 +56,12 @@ public class Player {
 			hand.remove(0);
 		} 
 		return temp;
+	}
+	
+	
+	private void playCard(Card card){
+		
+
 	}
 	
 	/*
