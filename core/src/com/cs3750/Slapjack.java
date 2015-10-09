@@ -15,6 +15,7 @@ import com.badlogic.gdx.graphics.g2d.ParticleEffect;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
@@ -155,20 +156,21 @@ public class Slapjack extends ApplicationAdapter {
 		}
 		
 		if(gamePhase == GamePhases.GAME_PLAY){
-			if(cardStack.size() > 0)
-			{
-				Card currCard = cardStack.get(cardStack.size() - 1);
-				if(currCard.getRank() == "JACK"){
-					jackPlayed = true;
-				}
-			}
+			//always checking to see if a Jack has been played
+			checkForJack();
+			
+			//always checking to see if a slap has happened
+			checkForSlap();
+			//check to see who's turn it is
+			
+			//play the card
 		}
 		
 		if(gamePhase == GamePhases.WINNER){
 			
 		}
 	}
-	
+
 	//Don't delete! Used to clean up at the end
 	@Override
 	public void dispose() {
@@ -259,15 +261,49 @@ public class Slapjack extends ApplicationAdapter {
 		//deal deck out to players
 		deck.deal(players);
 		
-		//test and see what cards each player has - not required for actual gameplay
+		//test and see what cards each player has - not required for actual game play
 		for (Player player : players){
 			testWhatDoesPlayerHave(player);
 		}
 	}
 
-	//Getter/Setter to see if a jack has been played. Helps manage the slap method.
-	public static boolean isJackPlayed() {
+	// run in the render method to see if the most recently played card is a jack 
+	public void checkForJack() {
+		if(cardStack.size() > 0){
+			Card currCard = cardStack.get(cardStack.size() - 1);
+			if(currCard.getRank() == "JACK"){
+				jackPlayed = true;
+			}
+		}
+	}
+	
+	//getter and setter for jackPlayed. Helps manage the slap method
+	public void setJackPlayed(){
+		jackPlayed = true;
+	}
+	public static boolean getJackPlayed(){
 		return jackPlayed;
+	}
+	
+	// run in the render method to see if a player has slapped 
+	private void checkForSlap() {
+		// if the mouse click happened over the cardStack pile in the center of the play window
+		if(Gdx.input.isTouched()){
+			int x1 = Gdx.input.getX();
+			int y1 = Gdx.input.getY();
+			// TODO: determine the location for the cardStack
+			int xMin = 0;
+			int xMax = 100;
+			int yMin = 0;
+			int yMax = 100;
+			System.out.println("X: "+ x1 + " Y: "+y1);
+			
+			//within the boundaries
+			if(x1 > xMin && x1 < xMax && y1 > yMin && y1 < yMax){
+				    //get the player who slapped and call their slap method to determine validity
+					System.out.println("Slapped");
+			}
+		}
 	}
 	
 	 /*******************************
