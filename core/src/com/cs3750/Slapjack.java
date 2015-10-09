@@ -57,7 +57,7 @@ public class Slapjack extends ApplicationAdapter {
 	private TextButtonStyle textButtonStyle;
 	
 	private HashMap<String, Runnable> buttonMap = new HashMap<String, Runnable>();
-	private TextButton playCardButton;
+	private TextButton playGameButton;
 	
 	//Don't delete!
 	@Override
@@ -109,10 +109,10 @@ public class Slapjack extends ApplicationAdapter {
 		
 		//create buttons
 		//TODO second argument needs dynamic width for the width of the button, right now it is hard coded at 110
-		playCardButton = getButton("Play Game", (Gdx.graphics.getWidth()-110)/2, 75, "playCardButton", textButtonStyle);
+		playGameButton = getButton("Play Game", (Gdx.graphics.getWidth()-110)/2, 75, "playGameButton", textButtonStyle);
 		
 		//add buttons to map
-		buttonMap.put("playCardButton", new Runnable(){
+		buttonMap.put("playGameButton", new Runnable(){
 			public void run() {
 				//method called when the button is clicked
 				//the line below was part of a merge conflict
@@ -123,7 +123,7 @@ public class Slapjack extends ApplicationAdapter {
 		});
 		
 		//add actors to stage
-		stage.addActor(playCardButton);
+		stage.addActor(playGameButton);
 	}
 
 	//Don't delete! Used for drawing on the screen
@@ -141,8 +141,6 @@ public class Slapjack extends ApplicationAdapter {
 		Gdx.input.setInputProcessor(stage); 
 		stage.draw();
 		
-		boolean jackPlayed;
-		
 		if(gamePhase == GamePhases.TITLE_SCREEN){
 			
 		} 
@@ -157,10 +155,13 @@ public class Slapjack extends ApplicationAdapter {
 		}
 		
 		if(gamePhase == GamePhases.GAME_PLAY){
-//			Card currCard = cardsPlayed.get(cardsPlayed.size() - 1);
-//			if(currCard.getRank() == "JACK"){
-//				jackPlayed = true;
-//			}
+			if(cardsPlayed.size() > 0)
+			{
+				Card currCard = cardsPlayed.get(cardsPlayed.size() - 1);
+				if(currCard.getRank() == "JACK"){
+					jackPlayed = true;
+				}
+			}
 		}
 		
 		if(gamePhase == GamePhases.WINNER){
@@ -217,12 +218,8 @@ public class Slapjack extends ApplicationAdapter {
 		batch.dispose();
 	}
 	
-	public void playGame() {
-		startGame();
-	}
-	
 	//Starts the game
-	public void startGame() {
+	public void playGame() {
 		
 		// create the deck
 		Deck deck = new Deck(cardSpriteSheet);
@@ -265,11 +262,6 @@ public class Slapjack extends ApplicationAdapter {
 	public static boolean isJackPlayed() {
 		return jackPlayed;
 	}
-
-	public void setJackPlayed(boolean jackPlayed) {
-		this.jackPlayed = jackPlayed;
-	}
-	
 	
 }
 

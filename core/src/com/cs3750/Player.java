@@ -49,19 +49,13 @@ public class Player {
 	}
 	
 
-	private ArrayList<Card> playCard(){
-		ArrayList<Card> temp = new ArrayList<Card>();
+	private Card playCard(){
+		Card temp = null;
 		if(!hand.isEmpty()) {
-			temp.add(hand.get(0));
+			temp = hand.get(0);
 			hand.remove(0);
 		} 
 		return temp;
-	}
-	
-	
-	private void playCard(Card card){
-		
-
 	}
 	
 	/*
