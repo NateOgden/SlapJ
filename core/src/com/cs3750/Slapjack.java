@@ -46,7 +46,7 @@ public class Slapjack extends ApplicationAdapter {
 	private int MIN_WIDTH;
 	private int numPlayers;
 	private static boolean jackPlayed = false;
-	private List<Card> cardsPlayed;
+	//private List<Card> cardsPlayed;
 	
 	private Stage startStage;
 	private Stage stage;
@@ -155,9 +155,9 @@ public class Slapjack extends ApplicationAdapter {
 		}
 		
 		if(gamePhase == GamePhases.GAME_PLAY){
-			if(cardsPlayed.size() > 0)
+			if(cardStack.size() > 0)
 			{
-				Card currCard = cardsPlayed.get(cardsPlayed.size() - 1);
+				Card currCard = cardStack.get(cardStack.size() - 1);
 				if(currCard.getRank() == "JACK"){
 					jackPlayed = true;
 				}
@@ -168,6 +168,34 @@ public class Slapjack extends ApplicationAdapter {
 			
 		}
 	}
+	
+	//Don't delete! Used to clean up at the end
+	@Override
+	public void dispose() {
+		batch.dispose();
+	}
+	
+	 /*******************************
+	 * Visual Component Methods
+	 ********************************/
+	//this method is used to create a button
+	private TextButton getButton(String buttonText, int xPosition,
+			int yPosition, final String id, TextButtonStyle textButtonStyle) {
+		TextButton button = new TextButton(buttonText, textButtonStyle);
+		button.setPosition(xPosition, yPosition);
+		//this uses the buttonMap to get the correct method to run once a button is clicked
+		button.addListener(new ClickListener() {
+			public void clicked(InputEvent event, float x, float y) {
+				buttonMap.get(id).run();
+			}
+		});
+		return button;
+	}
+	
+	
+	 /*******************************
+	 * Animation Methods
+	 ********************************/
 	
 	private void stopDealAnimation() {		
 		//multiple player animations
@@ -212,11 +240,9 @@ public class Slapjack extends ApplicationAdapter {
 		}
 	}
 
-	//Don't delete! Used to clean up at the end
-	@Override
-	public void dispose() {
-		batch.dispose();
-	}
+	 /*******************************
+	 * Game Play Methods
+	 ********************************/
 	
 	//Starts the game
 	public void playGame() {
@@ -225,42 +251,32 @@ public class Slapjack extends ApplicationAdapter {
 		Deck deck = new Deck(cardSpriteSheet);
 		deck.shuffle();
 				
-		//deal deck out to players
-		
+		//create the players
 		for(int i = 0; i < numPlayers; i++){
 			players.add(new Player());
 		}
 		
+		//deal deck out to players
 		deck.deal(players);
 		
+		//test and see what cards each player has - not required for actual gameplay
 		for (Player player : players){
 			testWhatDoesPlayerHave(player);
 		}
 	}
+
+	//Getter/Setter to see if a jack has been played. Helps manage the slap method.
+	public static boolean isJackPlayed() {
+		return jackPlayed;
+	}
+	
+	 /*******************************
+	 * Testing Methods
+	 ********************************/
 	
 	public void testWhatDoesPlayerHave(Player player) {
 		System.out.println(player.toString() + " has the following cards:");
 		player.revealHand();
-	}
-	
-	//this method is used to create a button
-	private TextButton getButton(String buttonText, int xPosition,
-			int yPosition, final String id, TextButtonStyle textButtonStyle) {
-		TextButton button = new TextButton(buttonText, textButtonStyle);
-		button.setPosition(xPosition, yPosition);
-		//this uses the buttonMap to get the correct method to run once a button is clicked
-		button.addListener(new ClickListener() {
-			public void clicked(InputEvent event, float x, float y) {
-				buttonMap.get(id).run();
-			}
-		});
-		return button;
-	}
-
-	
-	//Getter/Setter to see if a jack has been played. Helps manage the slap method.
-	public static boolean isJackPlayed() {
-		return jackPlayed;
 	}
 	
 }
