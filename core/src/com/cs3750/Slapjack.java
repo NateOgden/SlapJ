@@ -28,6 +28,8 @@ import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 public class Slapjack extends ApplicationAdapter {
 	public enum GamePhases{ TITLE_SCREEN, DEAL, GAME_PLAY, WINNER }
 	private GamePhases gamePhase = GamePhases.TITLE_SCREEN;
+	public enum GamePlayTurn{HUMAN, COMPUTER}
+	private GamePlayTurn whoseTurn = GamePlayTurn.HUMAN;
 	
 	//for dynamic amount of players 
 	private ArrayList<Player> players;
@@ -59,6 +61,7 @@ public class Slapjack extends ApplicationAdapter {
 	
 	private HashMap<String, Runnable> buttonMap = new HashMap<String, Runnable>();
 	private TextButton playGameButton;
+	private TextButton testCardStack;
 	
 	//Don't delete!
 	@Override
@@ -111,6 +114,7 @@ public class Slapjack extends ApplicationAdapter {
 		//create buttons
 		//TODO second argument needs dynamic width for the width of the button, right now it is hard coded at 110
 		playGameButton = getButton("Play Game", (Gdx.graphics.getWidth()-110)/2, 75, "playGameButton", textButtonStyle);
+		testCardStack = getButton("Test Card Stack", 200, 75, "playGameButton", textButtonStyle);
 		
 		//add buttons to map
 		buttonMap.put("playGameButton", new Runnable(){
@@ -123,8 +127,15 @@ public class Slapjack extends ApplicationAdapter {
 			}
 		});
 		
+		buttonMap.put("testCardStack", new Runnable(){
+			public void run() {
+				testWhatCardsAreOnTheBoard();
+			}
+		});
+		
 		//add actors to stage
 		stage.addActor(playGameButton);
+		stage.addActor(testCardStack);
 	}
 
 	//Don't delete! Used for drawing on the screen
@@ -146,7 +157,7 @@ public class Slapjack extends ApplicationAdapter {
 			
 		} 
 		
-		if(gamePhase == GamePhases.DEAL && timer >= 4.5){
+		if(gamePhase == GamePhases.DEAL && timer >= 4.5f){
 			stopDealAnimation();
 			timer = 0f;
 			gamePhase = GamePhases.GAME_PLAY;
@@ -157,14 +168,34 @@ public class Slapjack extends ApplicationAdapter {
 		
 		if(gamePhase == GamePhases.GAME_PLAY){
 			//always checking to see if a Jack has been played
-			checkForJack();
+			//checkForJack();
 			
 			//always checking to see if a slap has happened
 			checkForSlap();
-			//check to see who's turn it is
 			
-			//play the card
+			if(whoseTurn == GamePlayTurn.HUMAN){
+				// manually play their card by clicking on their deck
+				if(checkForCardPlay()){
+					cardStack.add(players.get(0).playCard());
+					// now the computer's turn
+					whoseTurn = GamePlayTurn.COMPUTER;
+				}
+			} else if (whoseTurn == GamePlayTurn.COMPUTER){
+				// computer players play their cards in turn with timer delay
+				// timer delay is mostly for the human so they can slap
+				for(int i = 0; i < players.size(); i++){
+					if (timer > 6f){
+						timer = 0f;
+						cardStack.add(players.get(i).playCard());
+					} else {
+						timer += Gdx.graphics.getDeltaTime();
+					}
+				}
+				// now the human's turn
+				whoseTurn = GamePlayTurn.HUMAN;
+			}	
 		}
+		
 		
 		if(gamePhase == GamePhases.WINNER){
 			
@@ -280,6 +311,7 @@ public class Slapjack extends ApplicationAdapter {
 	//getter and setter for jackPlayed. Helps manage the slap method
 	public void setJackPlayed(){
 		jackPlayed = true;
+		System.out.println("A jack is in the cardStack");
 	}
 	public static boolean getJackPlayed(){
 		return jackPlayed;
@@ -306,6 +338,31 @@ public class Slapjack extends ApplicationAdapter {
 		}
 	}
 	
+	// run in the render method to see if a player has played their card
+	private Boolean checkForCardPlay() {
+		// if the mouse click happened over the cardStack pile in the center of the play window
+		if(Gdx.input.isTouched()){
+			int x1 = Gdx.input.getX();
+			int y1 = Gdx.input.getY();
+			// TODO: determine the location for the cardStack
+			int xMin = (Gdx.graphics.getWidth()-cardBackTexture.getWidth())/2;
+			int xMax = (Gdx.graphics.getWidth()+cardBackTexture.getWidth())/2;;
+			int yMin = (Gdx.graphics.getHeight()-cardBackTexture.getHeight())/2;;
+			int yMax = (Gdx.graphics.getHeight()+cardBackTexture.getHeight())/2;;
+			System.out.println("X: "+ x1 + " Y: "+y1);
+			
+			//within the boundaries
+			if(x1 > xMin && x1 < xMax && y1 > yMin && y1 < yMax){
+				    //get the player who slapped and call their slap method to determine validity
+					System.out.println("Player Played Card");
+					testWhatCardsAreOnTheBoard();
+					return true;
+			}
+		}
+		return false;
+	}
+	
+	
 	 /*******************************
 	 * Testing Methods
 	 ********************************/
@@ -313,6 +370,15 @@ public class Slapjack extends ApplicationAdapter {
 	public void testWhatDoesPlayerHave(Player player) {
 		System.out.println(player.toString() + " has the following cards:");
 		player.revealHand();
+	}
+	
+	public void testWhatCardsAreOnTheBoard() {
+		System.out.println("________________________________________");
+		System.out.println("The following cards are on the board:");
+		for(Card card : cardStack){
+			System.out.println(card.toString());
+		}
+		System.out.println("________________________________________");
 	}
 	
 }

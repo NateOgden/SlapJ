@@ -13,6 +13,10 @@ public class Player {
 		canSlapIn = true;
 	}
 	
+	public int handSize(){
+		return hand.size();
+	}
+	
 	public void addToHand(Card card) {
 		hand.add(card);
 	}
@@ -49,7 +53,7 @@ public class Player {
 	}
 	
 
-	private Card playCard(){
+	public Card playCard(){
 		Card temp = null;
 		if(!hand.isEmpty()) {
 			temp = hand.get(0);
