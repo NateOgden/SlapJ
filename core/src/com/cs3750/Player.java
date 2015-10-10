@@ -36,8 +36,9 @@ public class Player {
 	}
 		
 	public boolean slap(String rank) {	
-		if(Slapjack.getJackPlayed() && rank != "JACK" && hand.isEmpty())
+		if(Slapjack.getJackPlayed() && rank != "JACK" && hand.isEmpty()){
 			canSlapIn = false;
+		}
 		return canSlapIn;
 	}
 	
@@ -52,6 +53,9 @@ public class Player {
 		return temp;
 	}
 	
+	public Card looseCard(){
+		return playCard();
+	}
 
 	public Card playCard(){
 		Card temp = null;
