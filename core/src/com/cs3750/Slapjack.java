@@ -363,7 +363,7 @@ public class Slapjack extends ApplicationAdapter {
 						cardStack.clear();
 					} else {
 						//gives a card to the last person to play if slap was incorrect
-						lastToPlay.addToHand(players.get(0).looseCard());
+						lastToPlay.addToHand(players.get(0).giveUpCard());
 					}
 					
 			}

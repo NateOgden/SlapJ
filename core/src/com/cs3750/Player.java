@@ -42,18 +42,7 @@ public class Player {
 		return canSlapIn;
 	}
 	
-	private ArrayList<Card> giveUpCard(Card card){
-		ArrayList<Card> temp = new ArrayList<Card>();
-		if(card.getRank() != "JACK") {
-			if(!hand.isEmpty()) {
-				temp.add(hand.get(0));
-				hand.remove(0);
-			}
-		}
-		return temp;
-	}
-	
-	public Card looseCard(){
+	public Card giveUpCard(){
 		return playCard();
 	}
 
