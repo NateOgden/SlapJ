@@ -351,6 +351,8 @@ public class Slapjack extends ApplicationAdapter {
 			//within the boundaries
 			if(x1 > xMin && x1 < xMax && y1 > yMin && y1 < yMax){
 				    //get the player who slapped and call their slap method to determine validity
+					String topCard = cardStack.get(cardStack.size()-1).getRank();
+					players.get(0).slap(topCard);
 					System.out.println("Slapped");
 			}
 		}
