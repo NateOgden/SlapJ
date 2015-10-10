@@ -49,4 +49,8 @@ public class Card {
 	public String getRank() {
 		return rank.toString();
 	}
+	
+	public String toString(){
+		return rank + " of " + suit;
+	}
 }

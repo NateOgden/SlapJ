@@ -15,6 +15,7 @@ import com.badlogic.gdx.graphics.g2d.ParticleEffect;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
@@ -27,19 +28,20 @@ import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 public class Slapjack extends ApplicationAdapter {
 	public enum GamePhases{ TITLE_SCREEN, DEAL, GAME_PLAY, WINNER }
 	private GamePhases gamePhase = GamePhases.TITLE_SCREEN;
+	public enum GamePlayTurn{HUMAN, COMPUTER}
+	private GamePlayTurn whoseTurn = GamePlayTurn.HUMAN;
 	
+	//for dynamic amount of players 
+	private ArrayList<Player> players;
+	private ArrayList<Card> cardStack;
+
 	private SpriteBatch batch;
 	private Texture background;	
 	private Texture cardSpriteSheet;
 	
-	//for cardback animations
+	//for card back animations
 	private Sprite[] cardBackSprites;
 	private Texture cardBackTexture;
-	private Sprite cardBack;
-	private Sprite cardBackUL;
-	private Sprite cardBackLL;
-	private Sprite cardBackUR;
-	private Sprite cardBackLR;
 	private float timer = 0f;
 	private int MAX_HEIGHT;
 	private int MIN_HEIGHT; 
@@ -47,7 +49,7 @@ public class Slapjack extends ApplicationAdapter {
 	private int MIN_WIDTH;
 	private int numPlayers;
 	private static boolean jackPlayed = false;
-	private List<Card> cardsPlayed;
+	//private List<Card> cardsPlayed;
 	
 	private Stage startStage;
 	private Stage stage;
@@ -58,14 +60,17 @@ public class Slapjack extends ApplicationAdapter {
 	private TextButtonStyle textButtonStyle;
 	
 	private HashMap<String, Runnable> buttonMap = new HashMap<String, Runnable>();
-	private TextButton playCardButton;
+	private TextButton playGameButton;
+	private TextButton testCardStack;
 	
 	//Don't delete!
 	@Override
 	public void create () {	
 		
 		//environment variables
-		numPlayers = 4;		
+		numPlayers = 7;
+		players = new ArrayList<Player>();
+		cardStack = new ArrayList<Card>();
 		
 		batch = new SpriteBatch();
 		
@@ -88,18 +93,7 @@ public class Slapjack extends ApplicationAdapter {
 			cardBackSprites[i] = new Sprite(cardBackTexture);
 			cardBackSprites[i].setPosition((Gdx.graphics.getWidth()-cardBackSprites[i].getWidth())/2, (Gdx.graphics.getHeight()-cardBackSprites[i].getHeight())/2);
 		}
-		
-//		cardBack = new Sprite(cardBackTexture);
-//		cardBack.setPosition((Gdx.graphics.getWidth()-cardBack.getWidth())/2, (Gdx.graphics.getHeight()-cardBack.getHeight())/2);
-//		cardBackUL = new Sprite(cardBackTexture);
-//		cardBackUL.setPosition((Gdx.graphics.getWidth()-cardBack.getWidth())/2, (Gdx.graphics.getHeight()-cardBack.getHeight())/2);
-//		cardBackLL = new Sprite(cardBackTexture);
-//		cardBackLL.setPosition((Gdx.graphics.getWidth()-cardBack.getWidth())/2, (Gdx.graphics.getHeight()-cardBack.getHeight())/2);
-//		cardBackUR = new Sprite(cardBackTexture);
-//		cardBackUR.setPosition((Gdx.graphics.getWidth()-cardBack.getWidth())/2, (Gdx.graphics.getHeight()-cardBack.getHeight())/2);
-//		cardBackLR = new Sprite(cardBackTexture);
-//		cardBackLR.setPosition((Gdx.graphics.getWidth()-cardBack.getWidth())/2, (Gdx.graphics.getHeight()-cardBack.getHeight())/2);
-		
+			
 		MAX_HEIGHT = Gdx.graphics.getHeight()-215;
 		MIN_HEIGHT = 75;
 		MAX_WIDTH = Gdx.graphics.getWidth()-300;
@@ -119,10 +113,11 @@ public class Slapjack extends ApplicationAdapter {
 		
 		//create buttons
 		//TODO second argument needs dynamic width for the width of the button, right now it is hard coded at 110
-		playCardButton = getButton("Play Game", (Gdx.graphics.getWidth()-110)/2, 75, "playCardButton", textButtonStyle);
+		playGameButton = getButton("Play Game", (Gdx.graphics.getWidth()-110)/2, 75, "playGameButton", textButtonStyle);
+		testCardStack = getButton("Test Card Stack", 200, 75, "playGameButton", textButtonStyle);
 		
 		//add buttons to map
-		buttonMap.put("playCardButton", new Runnable(){
+		buttonMap.put("playGameButton", new Runnable(){
 			public void run() {
 				//method called when the button is clicked
 				//the line below was part of a merge conflict
@@ -132,8 +127,15 @@ public class Slapjack extends ApplicationAdapter {
 			}
 		});
 		
+		buttonMap.put("testCardStack", new Runnable(){
+			public void run() {
+				testWhatCardsAreOnTheBoard();
+			}
+		});
+		
 		//add actors to stage
-		stage.addActor(playCardButton);
+		stage.addActor(playGameButton);
+		stage.addActor(testCardStack);
 	}
 
 	//Don't delete! Used for drawing on the screen
@@ -144,12 +146,6 @@ public class Slapjack extends ApplicationAdapter {
 		
 		batch.begin();
 		batch.draw(background, 0, 0);
-		//cardBack.draw(batch);
-//		cardBackUL.draw(batch);
-//		cardBackLL.draw(batch);
-//		cardBackUR.draw(batch);
-//		cardBackLR.draw(batch);
-
 		for(Sprite s: cardBackSprites){
 			s.draw(batch);
 		}
@@ -157,13 +153,11 @@ public class Slapjack extends ApplicationAdapter {
 		Gdx.input.setInputProcessor(stage); 
 		stage.draw();
 		
-		boolean jackPlayed;
-		
 		if(gamePhase == GamePhases.TITLE_SCREEN){
 			
 		} 
 		
-		if(gamePhase == GamePhases.DEAL && timer >= 4){
+		if(gamePhase == GamePhases.DEAL && timer >= 4.5f){
 			stopDealAnimation();
 			timer = 0f;
 			gamePhase = GamePhases.GAME_PLAY;
@@ -173,30 +167,70 @@ public class Slapjack extends ApplicationAdapter {
 		}
 		
 		if(gamePhase == GamePhases.GAME_PLAY){
-			Card currCard = cardsPlayed.get(cardsPlayed.size() - 1);
-			if(currCard.getRank() == "JACK"){
-				jackPlayed = true;
-			}
+			//always checking to see if a Jack has been played
+			//checkForJack();
+			
+			//always checking to see if a slap has happened
+			checkForSlap();
+			
+			if(whoseTurn == GamePlayTurn.HUMAN){
+				// manually play their card by clicking on their deck
+				if(checkForCardPlay()){
+					cardStack.add(players.get(0).playCard());
+					// now the computer's turn
+					whoseTurn = GamePlayTurn.COMPUTER;
+				}
+			} else if (whoseTurn == GamePlayTurn.COMPUTER){
+				// computer players play their cards in turn with timer delay
+				// timer delay is mostly for the human so they can slap
+				for(int i = 0; i < players.size(); i++){
+					if (timer > 6f){
+						timer = 0f;
+						cardStack.add(players.get(i).playCard());
+					} else {
+						timer += Gdx.graphics.getDeltaTime();
+					}
+				}
+				// now the human's turn
+				whoseTurn = GamePlayTurn.HUMAN;
+			}	
 		}
+		
 		
 		if(gamePhase == GamePhases.WINNER){
 			
 		}
 	}
+
+	//Don't delete! Used to clean up at the end
+	@Override
+	public void dispose() {
+		batch.dispose();
+	}
 	
-	private void stopDealAnimation() {
-		//again, testing with 4 players, needs to be refactored for different amount of players		
-		//target positions
-//		Vector2 targetUpperLeft = new Vector2(MIN_WIDTH,MAX_HEIGHT);
-//		Vector2 targetLowerLeft = new Vector2(MIN_WIDTH,MIN_HEIGHT);
-//		Vector2 targetUpperRight = new Vector2(MAX_WIDTH,MAX_HEIGHT);
-//		Vector2 targetLowerRight = new Vector2(MAX_WIDTH,MIN_HEIGHT);
-//		
-//		cardBackUL.setPosition(targetUpperLeft.x, targetUpperLeft.y);
-//		cardBackLL.setPosition(targetLowerLeft.x, targetLowerLeft.y);
-//		cardBackUR.setPosition(targetUpperRight.x, targetUpperRight.y);
-//		cardBackLR.setPosition(targetLowerRight.x, targetLowerRight.y);
-		
+	 /*******************************
+	 * Visual Component Methods
+	 ********************************/
+	//this method is used to create a button
+	private TextButton getButton(String buttonText, int xPosition,
+			int yPosition, final String id, TextButtonStyle textButtonStyle) {
+		TextButton button = new TextButton(buttonText, textButtonStyle);
+		button.setPosition(xPosition, yPosition);
+		//this uses the buttonMap to get the correct method to run once a button is clicked
+		button.addListener(new ClickListener() {
+			public void clicked(InputEvent event, float x, float y) {
+				buttonMap.get(id).run();
+			}
+		});
+		return button;
+	}
+	
+	
+	 /*******************************
+	 * Animation Methods
+	 ********************************/
+	
+	private void stopDealAnimation() {		
 		//multiple player animations
 		Vector2 targetPositions[] = new Vector2[numPlayers];
 		int margin = ((1080 - (cardBackTexture.getWidth() * (numPlayers-1))) / numPlayers) / 2;
@@ -208,61 +242,6 @@ public class Slapjack extends ApplicationAdapter {
 	}
 
 	private void dealAnimation(int numPlayers) {
-		//again, testing with 4 players, needs to be refactored for different amount of players
-		//target positions
-//		Vector2 targetUpperLeft = new Vector2(MIN_WIDTH,MAX_HEIGHT);
-//		Vector2 targetLowerLeft = new Vector2(MIN_WIDTH,MIN_HEIGHT);
-//		Vector2 targetUpperRight = new Vector2(MAX_WIDTH,MAX_HEIGHT);
-//		Vector2 targetLowerRight = new Vector2(MAX_WIDTH,MIN_HEIGHT);
-//		
-//		//movement position
-//		Vector2 movementUpperLeft = new Vector2();
-//		Vector2 movementLowerLeft = new Vector2();
-//		Vector2 movementUpperRight = new Vector2();
-//		Vector2 movementLowerRight = new Vector2();
-//		
-//		//velocity
-//		float xMovement = (65 * Gdx.graphics.getDeltaTime());
-//		float yMovement = (37 * Gdx.graphics.getDeltaTime());
-//		
-//		//For cardBack Upper Left
-//		if(cardBackUL.getX() > targetUpperLeft.x ){
-//			movementUpperLeft.x = cardBackUL.getX() - xMovement;
-//		}
-//		if(cardBackUL.getY() < targetUpperLeft.y) {
-//			movementUpperLeft.y = cardBackUL.getY() + yMovement;
-//		}
-//		cardBackUL.setPosition(movementUpperLeft.x, movementUpperLeft.y);
-//		
-//
-//		//For cardBack Lower Left
-//		if(cardBackLL.getX() > targetLowerLeft.x){
-//			movementLowerLeft.x = cardBackLL.getX() - xMovement;
-//		}
-//		if(cardBackLL.getY() > targetLowerLeft.y){
-//			movementLowerLeft.y = cardBackLL.getY() - yMovement;
-//		}
-//		cardBackLL.setPosition(movementLowerLeft.x, movementLowerLeft.y);
-//		
-//		//For cardBack Upper Right
-//		if(cardBackUR.getX() < targetUpperRight.x){
-//			movementUpperRight.x = cardBackUR.getX() + xMovement;
-//		}
-//		if(cardBackUR.getY() < targetUpperRight.y){
-//			movementUpperRight.y = cardBackUR.getY() + yMovement;
-//		}
-//		cardBackUR.setPosition(movementUpperRight.x, movementUpperRight.y);
-//		
-//		//For cardBack Lower Right
-//		if(cardBackLR.getX() < targetLowerRight.x) {
-//			movementLowerRight.x = cardBackLR.getX() + xMovement;
-//		}
-//		if(cardBackLR.getY() > targetLowerRight.y){
-//			movementLowerRight.y = cardBackLR.getY() - yMovement;
-//		}
-//		cardBackLR.setPosition(movementLowerRight.x, movementLowerRight.y);
-
-
 		//multiple player animations
 		//target positions and movement positions
 		Vector2 targetPositions[] = new Vector2[numPlayers];
@@ -294,72 +273,123 @@ public class Slapjack extends ApplicationAdapter {
 		}
 	}
 
-	//Don't delete! Used to clean up at the end
-	@Override
-	public void dispose() {
-		batch.dispose();
-	}
-	
-	public void playGame() {
-		startGame();
-	}
+	 /*******************************
+	 * Game Play Methods
+	 ********************************/
 	
 	//Starts the game
-	public void startGame() {
+	public void playGame() {
 		
 		// create the deck
 		Deck deck = new Deck(cardSpriteSheet);
 		deck.shuffle();
 				
-		//deal deck out to players
-		//for now there will be four players
-		//can make it more dynamic, more or less players, if we want
-		//but for the sake of testing now, I will create four players
-		Player player1 = new Player();
-		Player player2 = new Player();
-		Player player3 = new Player();
-		Player player4 = new Player();
+		//create the players
+		for(int i = 0; i < numPlayers; i++){
+			players.add(new Player());
+		}
 		
-		//each player gets a hand of cards
-		int numPlayers = 4;
-		player1.addToHand(deck.deal(numPlayers));
-		player2.addToHand(deck.deal(numPlayers));
-		player3.addToHand(deck.deal(numPlayers));
-		player4.addToHand(deck.deal(numPlayers));	
-	
-		/*
-		testWhatDoesPlayerHave(player1);
-		testWhatDoesPlayerHave(player2);
-		testWhatDoesPlayerHave(player3);
-		testWhatDoesPlayerHave(player4);
-		*/
+		//deal deck out to players
+		deck.deal(players);
+		
+		//test and see what cards each player has - not required for actual game play
+		for (Player player : players){
+			testWhatDoesPlayerHave(player);
+		}
 	}
+
+	// run in the render method to see if the most recently played card is a jack 
+	public void checkForJack() {
+		if(cardStack.size() > 0){
+			Card currCard = cardStack.get(cardStack.size() - 1);
+			if(currCard.getRank() == "JACK"){
+				jackPlayed = true;
+			}
+		}
+	}
+	
+	//getter and setter for jackPlayed. Helps manage the slap method
+	public void setJackPlayed(){
+		jackPlayed = true;
+		System.out.println("A jack is in the cardStack");
+	}
+	public static boolean getJackPlayed(){
+		return jackPlayed;
+	}
+	
+	// run in the render method to see if a player has slapped 
+	private void checkForSlap() {
+		// if the mouse click happened over the cardStack pile in the center of the play window
+		if(Gdx.input.isTouched()){
+			int x1 = Gdx.input.getX();
+			int y1 = Gdx.input.getY();
+			// TODO: determine the location for the cardStack
+			int xMin = 0;
+			int xMax = 100;
+			int yMin = 0;
+			int yMax = 100;
+			System.out.println("X: "+ x1 + " Y: "+y1);
+			
+			//within the boundaries
+			if(x1 > xMin && x1 < xMax && y1 > yMin && y1 < yMax){
+				    //get the player who slapped and call their slap method to determine validity
+					System.out.println("Slapped");
+			}
+		}
+	}
+	
+	// run in the render method to see if a player has played their card
+	private Boolean checkForCardPlay() {
+		// if the mouse click happened over the cardStack pile in the center of the play window
+		if(Gdx.input.isTouched()){
+			int x1 = Gdx.input.getX();
+			int y1 = Gdx.input.getY();
+			// TODO: determine the location for the cardStack
+			int xMin = (Gdx.graphics.getWidth()-cardBackTexture.getWidth())/2;
+			int xMax = (Gdx.graphics.getWidth()+cardBackTexture.getWidth())/2;;
+			int yMin = (Gdx.graphics.getHeight()-cardBackTexture.getHeight())/2;;
+			int yMax = (Gdx.graphics.getHeight()+cardBackTexture.getHeight())/2;;
+			System.out.println("X: "+ x1 + " Y: "+y1);
+			
+			//within the boundaries
+			if(x1 > xMin && x1 < xMax && y1 > yMin && y1 < yMax){
+				    //get the player who slapped and call their slap method to determine validity
+					System.out.println("Player Played Card");
+					testWhatCardsAreOnTheBoard();
+					return true;
+			}
+		}
+		return false;
+	}
+<<<<<<< HEAD
+
+	public void setJackPlayed(boolean jackPlayed) {
+		this.jackPlayed = jackPlayed;
+	}	
+}
+=======
+	
+	
+	 /*******************************
+	 * Testing Methods
+	 ********************************/
 	
 	public void testWhatDoesPlayerHave(Player player) {
 		System.out.println(player.toString() + " has the following cards:");
 		player.revealHand();
 	}
 	
-	//this method is used to create a button
-	private TextButton getButton(String buttonText, int xPosition,
-			int yPosition, final String id, TextButtonStyle textButtonStyle) {
-		TextButton button = new TextButton(buttonText, textButtonStyle);
-		button.setPosition(xPosition, yPosition);
-		//this uses the buttonMap to get the correct method to run once a button is clicked
-		button.addListener(new ClickListener() {
-			public void clicked(InputEvent event, float x, float y) {
-				buttonMap.get(id).run();
-			}
-		});
-		return button;
+	public void testWhatCardsAreOnTheBoard() {
+		System.out.println("________________________________________");
+		System.out.println("The following cards are on the board:");
+		for(Card card : cardStack){
+			System.out.println(card.toString());
+		}
+		System.out.println("________________________________________");
 	}
 	
-	//Getter/Setter to see if a jack has been played. Helps manage the slap method.
-	public static boolean isJackPlayed() {
-		return jackPlayed;
-	}
-
-	public void setJackPlayed(boolean jackPlayed) {
-		this.jackPlayed = jackPlayed;
-	}	
 }
+
+
+
+>>>>>>> origin/master

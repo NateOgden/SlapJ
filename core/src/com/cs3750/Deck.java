@@ -12,11 +12,10 @@ import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 
 public class Deck {
-	
-	ArrayList<Card> deck = new ArrayList<Card>();
-	private static int DECK_SIZE = 52;
+
+	private ArrayList<Card> deck = new ArrayList<Card>();
 	private final Sprite[] cardSprites;
-	
+
 	public Deck(Texture cardTexture) {
 		cardSprites = new Sprite[52];
 		TextureRegion[][] tmp = TextureRegion.split(cardTexture, cardTexture.getWidth()/13, cardTexture.getHeight()/4);
@@ -27,29 +26,31 @@ public class Deck {
 				deck.add(card);	
 			}
 		}
-		
+
 	}
 
 	public void shuffle(){
 		long seed = System.nanoTime();
 		Collections.shuffle(deck, new Random(seed));
 	}
-	
-	public ArrayList<Card> deal(int numPlayers) {
-		//for testing there are four players, giving each player 13 cards
-		int dealOut = DECK_SIZE/numPlayers;
-		ArrayList<Card> playerHand = new ArrayList<Card>();
-		for(int i=0; i < dealOut; i++) {
-			playerHand.add(deck.get(0));
-			deck.remove(0);			//this bumps what was in [1] into [0], so it will always pull from the top of the deck
+
+	public void deal(ArrayList<Player> players) {
+		while (deck.size() != 0){
+			for(Player player : players){
+				if(deck.size() != 0){
+					player.addToHand(getTopCard());
+				} else {
+					break;
+				}
+			}
 		}
-		return playerHand;
 	}
-	
+
+
 	public Card getTopCard(){
 		return deck.remove(0);
 	}
-	
+
 	public void addAll(Collection <? extends Card> collection){
 		deck.addAll(collection);
 	}	

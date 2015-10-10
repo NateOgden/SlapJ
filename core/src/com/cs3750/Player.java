@@ -13,6 +13,10 @@ public class Player {
 		canSlapIn = true;
 	}
 	
+	public int handSize(){
+		return hand.size();
+	}
+	
 	public void addToHand(Card card) {
 		hand.add(card);
 	}
@@ -32,7 +36,7 @@ public class Player {
 	}
 		
 	private boolean slap(Card card) {	
-		if(Slapjack.isJackPlayed() && card.getRank() != "JACK" && hand.isEmpty())
+		if(Slapjack.getJackPlayed() && card.getRank() != "JACK" && hand.isEmpty())
 			canSlapIn = false;
 		return canSlapIn;
 	}
@@ -48,10 +52,11 @@ public class Player {
 		return temp;
 	}
 	
-	private ArrayList<Card> playCard(){
-		ArrayList<Card> temp = new ArrayList<Card>();
+
+	public Card playCard(){
+		Card temp = null;
 		if(!hand.isEmpty()) {
-			temp.add(hand.get(0));
+			temp = hand.get(0);
 			hand.remove(0);
 		} 
 		return temp;
