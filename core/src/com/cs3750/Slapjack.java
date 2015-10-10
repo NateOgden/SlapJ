@@ -3,6 +3,7 @@ package com.cs3750;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Random;
 
 import com.badlogic.gdx.ApplicationAdapter;
 import com.badlogic.gdx.Gdx;
@@ -30,6 +31,7 @@ public class Slapjack extends ApplicationAdapter {
 	private GamePhases gamePhase = GamePhases.TITLE_SCREEN;
 	public enum GamePlayTurn{HUMAN, COMPUTER}
 	private GamePlayTurn whoseTurn = GamePlayTurn.HUMAN;
+	private Player lastToPlay; 
 	
 	//for dynamic amount of players 
 	private ArrayList<Player> players;
@@ -73,6 +75,7 @@ public class Slapjack extends ApplicationAdapter {
 		numPlayers = 7;
 		players = new ArrayList<Player>();
 		cardStack = new ArrayList<Card>();
+		lastToPlay = players.get(0);
 		
 		batch = new SpriteBatch();
 		
@@ -120,7 +123,7 @@ public class Slapjack extends ApplicationAdapter {
 		playGameButton = getButton("Play Game", (Gdx.graphics.getWidth()-buttonTexture.getWidth())/2, 75, "playGameButton", textButtonStyle);
 		playCardButton = getButton("Play Card", (Gdx.graphics.getWidth()-buttonTexture.getWidth())/2, 75, "playCardButton", textButtonStyle);
 		resetGameButton = getButton("Reset", (Gdx.graphics.getWidth()-buttonTexture.getWidth())/2, 75, "resetGameButton", textButtonStyle);
-		testCardStack = getButton("Test Card Stack", 200, 75, "playGameButton", textButtonStyle);
+		testCardStack = getButton("Test Card Stack", 200, 75, "testCardStack", textButtonStyle);
 		
 		//add buttons to map
 		buttonMap.put("playGameButton", new Runnable(){
@@ -198,6 +201,7 @@ public class Slapjack extends ApplicationAdapter {
 				// manually play their card by clicking on their deck
 				if(checkForCardPlay()){
 					cardStack.add(players.get(0).playCard());
+					lastToPlay = players.get(0);
 					// now the computer's turn
 					whoseTurn = GamePlayTurn.COMPUTER;
 				}
@@ -207,6 +211,7 @@ public class Slapjack extends ApplicationAdapter {
 				for(int i = 0; i < players.size(); i++){
 					waitTimer();
 					cardStack.add(players.get(i).playCard());
+					lastToPlay = players.get(i);
 				}
 				// now the human's turn
 				whoseTurn = GamePlayTurn.HUMAN;
@@ -351,7 +356,17 @@ public class Slapjack extends ApplicationAdapter {
 			//within the boundaries
 			if(x1 > xMin && x1 < xMax && y1 > yMin && y1 < yMax){
 				    //get the player who slapped and call their slap method to determine validity
-					System.out.println("Slapped");
+					String topCard = cardStack.get(cardStack.size()-1).getRank();
+					if(players.get(0).slap(topCard)){
+						//player gets the stack of cards with a correct slap
+						System.out.println("Slapped");
+						players.get(0).addToHand(cardStack);
+						cardStack.clear();
+					} else {
+						//gives a card to the last person to play if slap was incorrect
+						lastToPlay.addToHand(players.get(0).giveUpCard());
+					}
+					
 			}
 		}
 	}
@@ -380,15 +395,16 @@ public class Slapjack extends ApplicationAdapter {
 		}
 		return false;
 	}
-
-	public void setJackPlayed(boolean jackPlayed) {
-		this.jackPlayed = jackPlayed;
-	}	
-	
+		
 	private void waitTimer(){
+		Random r = new Random();
+		float timerPeriod = (float)r.nextInt(5);
+		if(timerPeriod <= 2f){
+			timerPeriod = 3f;
+		}
 		timer = 0f;
-		while(timer < 6f){
-			if( timer > 6f){
+		while(timer < timerPeriod){
+			if( timer > timerPeriod){
 				return;
 			} else {
 				timer += Gdx.graphics.getDeltaTime();

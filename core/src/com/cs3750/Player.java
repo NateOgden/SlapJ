@@ -35,23 +35,16 @@ public class Player {
 		}
 	}
 		
-	private boolean slap(Card card) {	
-		if(Slapjack.getJackPlayed() && card.getRank() != "JACK" && hand.isEmpty())
+	public boolean slap(String rank) {	
+		if(Slapjack.getJackPlayed() && rank != "JACK" && hand.isEmpty()){
 			canSlapIn = false;
+		}
 		return canSlapIn;
 	}
 	
-	private ArrayList<Card> giveUpCard(Card card){
-		ArrayList<Card> temp = new ArrayList<Card>();
-		if(card.getRank() != "JACK") {
-			if(!hand.isEmpty()) {
-				temp.add(hand.get(0));
-				hand.remove(0);
-			}
-		}
-		return temp;
+	public Card giveUpCard(){
+		return playCard();
 	}
-	
 
 	public Card playCard(){
 		Card temp = null;
