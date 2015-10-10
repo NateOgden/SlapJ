@@ -35,8 +35,8 @@ public class Player {
 		}
 	}
 		
-	private boolean slap(Card card) {	
-		if(Slapjack.getJackPlayed() && card.getRank() != "JACK" && hand.isEmpty())
+	public boolean slap(String rank) {	
+		if(Slapjack.getJackPlayed() && rank != "JACK" && hand.isEmpty())
 			canSlapIn = false;
 		return canSlapIn;
 	}
