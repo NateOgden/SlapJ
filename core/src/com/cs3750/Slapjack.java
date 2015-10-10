@@ -40,6 +40,7 @@ public class Slapjack extends ApplicationAdapter {
 	private SpriteBatch batch;
 	private Texture background;	
 	private Texture cardSpriteSheet;
+	private Texture cardStackLanderTexture;
 	
 	//for card back animations
 	private Sprite[] cardBackSprites;
@@ -80,6 +81,7 @@ public class Slapjack extends ApplicationAdapter {
 		
 		//background
 		background = new Texture(Gdx.files.internal("rustic_background.jpg"));
+		cardStackLanderTexture = new Texture(Gdx.files.internal("cardStackLander.png"));
 		
 		//cardSpriteSheet
 		cardSpriteSheet = new Texture(Gdx.files.internal("sprite_deck.png"));
@@ -165,6 +167,7 @@ public class Slapjack extends ApplicationAdapter {
 		
 		batch.begin();
 		batch.draw(background, 0, 0);
+		batch.draw(cardStackLanderTexture, 100, 100 );
 		for(Sprite s: cardBackSprites){
 			s.draw(batch);
 		}
