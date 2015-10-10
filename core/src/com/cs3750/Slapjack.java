@@ -123,7 +123,7 @@ public class Slapjack extends ApplicationAdapter {
 		playGameButton = getButton("Play Game", (Gdx.graphics.getWidth()-buttonTexture.getWidth())/2, 75, "playGameButton", textButtonStyle);
 		playCardButton = getButton("Play Card", (Gdx.graphics.getWidth()-buttonTexture.getWidth())/2, 75, "playCardButton", textButtonStyle);
 		resetGameButton = getButton("Reset", (Gdx.graphics.getWidth()-buttonTexture.getWidth())/2, 75, "resetGameButton", textButtonStyle);
-		testCardStack = getButton("Test Card Stack", 200, 75, "playGameButton", textButtonStyle);
+		testCardStack = getButton("Test Card Stack", 200, 75, "testCardStack", textButtonStyle);
 		
 		//add buttons to map
 		buttonMap.put("playGameButton", new Runnable(){
