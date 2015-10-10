@@ -205,12 +205,8 @@ public class Slapjack extends ApplicationAdapter {
 				// computer players play their cards in turn with timer delay
 				// timer delay is mostly for the human so they can slap
 				for(int i = 0; i < players.size(); i++){
-					if (timer > 6f){
-						timer = 0f;
-						cardStack.add(players.get(i).playCard());
-					} else {
-						timer += Gdx.graphics.getDeltaTime();
-					}
+					waitTimer();
+					cardStack.add(players.get(i).playCard());
 				}
 				// now the human's turn
 				whoseTurn = GamePlayTurn.HUMAN;
@@ -366,24 +362,40 @@ public class Slapjack extends ApplicationAdapter {
 		if(Gdx.input.isTouched()){
 			int x1 = Gdx.input.getX();
 			int y1 = Gdx.input.getY();
-			// TODO: determine the location for the cardStack
+			// TODO: determine the location for the cardStack, right now it is in the middle of the window
 			int xMin = (Gdx.graphics.getWidth()-cardBackTexture.getWidth())/2;
 			int xMax = (Gdx.graphics.getWidth()+cardBackTexture.getWidth())/2;;
 			int yMin = (Gdx.graphics.getHeight()-cardBackTexture.getHeight())/2;;
 			int yMax = (Gdx.graphics.getHeight()+cardBackTexture.getHeight())/2;;
-			System.out.println("X: "+ x1 + " Y: "+y1);
+			//System.out.println("X: "+ x1 + " Y: "+y1);
 			
 			//within the boundaries
 			if(x1 > xMin && x1 < xMax && y1 > yMin && y1 < yMax){
 				    //get the player who slapped and call their slap method to determine validity
-					System.out.println("Player Played Card");
+					// right now this method is only called by the single human player so we might not need to get them
+					System.out.println("Player played card");
 					testWhatCardsAreOnTheBoard();
 					return true;
 			}
 		}
 		return false;
 	}
+
+	public void setJackPlayed(boolean jackPlayed) {
+		this.jackPlayed = jackPlayed;
+	}	
 	
+	private void waitTimer(){
+		timer = 0f;
+		while(timer < 6f){
+			if( timer > 6f){
+				return;
+			} else {
+				timer += Gdx.graphics.getDeltaTime();
+			}
+			
+		}
+	}
 	
 	 /*******************************
 	 * Testing Methods
