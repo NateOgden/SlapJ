@@ -44,6 +44,7 @@ public class Slapjack extends ApplicationAdapter {
 	private SpriteBatch batch;
 	private Texture background;	
 	private Texture cardSpriteSheet;
+	private Texture cardLanderTexture;
 	
 	//for card back animations
 	private Sprite[] cardBackSprites;
@@ -80,15 +81,16 @@ public class Slapjack extends ApplicationAdapter {
 	public void create () {	
 		
 		//environment variables
-		numPlayers = 7;
+		numPlayers = 3;
 		players = new ArrayList<Player>();
 		cardStack = new ArrayList<Card>();
-		lastToPlay = players.get(0);
+		lastToPlay = null;
 		
 		batch = new SpriteBatch();
 		
 		//background
 		background = new Texture(Gdx.files.internal("rustic_background.jpg"));
+		cardLanderTexture = new Texture(Gdx.files.internal("cardStackLander.png"));
 		
 		//cardSpriteSheet
 		cardSpriteSheet = new Texture(Gdx.files.internal("sprite_deck.png"));
@@ -129,8 +131,6 @@ public class Slapjack extends ApplicationAdapter {
 		
 		//TODO, DO WE NEED THIS? NOT SURE HOW ITS IMPLEMENTED ON THE GUI
 		sliderStyle = new SliderStyle();
-		sliderStyle.knobAfter = skin.newDrawable("buttonDown");
-		sliderStyle.knobBefore = skin.newDrawable("buttonUp");
 
 		//create buttons
 		playGameButton = getButton("Play Game", (Gdx.graphics.getWidth()-buttonTexture.getWidth())/2, 75, "playGameButton", textButtonStyle);
@@ -139,11 +139,11 @@ public class Slapjack extends ApplicationAdapter {
 		testCardStack = getButton("Test Card Stack", 200, 75, "testCardStack", textButtonStyle);
 		
 		//create sliders
-		//TODO we need to add the slider for number of players and difficulty
-		//Trying to figure out if we need to create a skin for the slider.
-		numOfPlayerSlider = getSlider("Number of Players", (Gdx.graphics.getWidth()-buttonTexture.getWidth())/2, 75, "numOfPlayerSlider", sliderStyle);
-		difficultySlider = getSlider("Level of Difficulty", (Gdx.graphics.getWidth()-buttonTexture.getWidth())/2, 75, "difficultySlider", sliderStyle);
-		resetSlider = getSlider("Reset", (Gdx.graphics.getWidth()-buttonTexture.getWidth())/2, 75, "resetSlider", sliderStyle);
+		//TODO we need to add the slider for number of players, difficulty, and reset
+		//Do we need to create a skin for the slider?
+//		numOfPlayerSlider = getSlider("Number of Players", (Gdx.graphics.getWidth()-buttonTexture.getWidth())/2, 75, "numOfPlayerSlider", sliderStyle);
+//		difficultySlider = getSlider("Level of Difficulty", (Gdx.graphics.getWidth()-buttonTexture.getWidth())/2, 75, "difficultySlider", sliderStyle);
+//		resetSlider = getSlider("Reset", (Gdx.graphics.getWidth()-buttonTexture.getWidth())/2, 75, "resetSlider", sliderStyle);
 
 		//add buttons to map
 		buttonMap.put("playGameButton", new Runnable(){
@@ -206,7 +206,12 @@ public class Slapjack extends ApplicationAdapter {
 		
 		batch.begin();
 		batch.draw(background, 0, 0);
+
 		for (Sprite s : cardBackSprites){
+
+		batch.draw(cardLanderTexture,(Gdx.graphics.getWidth()-cardLanderTexture.getWidth())/2, (Gdx.graphics.getHeight()-cardLanderTexture.getHeight())/2);
+		
+
 			s.draw(batch);
 		}
 //		for(int i = 1; i < cardBackSprites.length; i++){
@@ -235,7 +240,7 @@ public class Slapjack extends ApplicationAdapter {
 			stage.draw();
 		
 			//always checking to see if a Jack has been played
-			//checkForJack();
+			checkForJack();
 			
 			//always checking to see if a slap has happened
 			checkForSlap();
@@ -261,7 +266,6 @@ public class Slapjack extends ApplicationAdapter {
 			}	
 		}
 		
-		
 		if(gamePhase == GamePhases.WINNER){
 			Gdx.input.setInputProcessor(endStage); 
 			endStage.draw();
@@ -278,8 +282,7 @@ public class Slapjack extends ApplicationAdapter {
 	 * Visual Component Methods
 	 ********************************/
 	//this method is used to create a button
-	private TextButton getButton(String buttonText, int xPosition,
-			int yPosition, final String id, TextButtonStyle textButtonStyle) {
+	private TextButton getButton(String buttonText, int xPosition, int yPosition, final String id, TextButtonStyle textButtonStyle) {
 		TextButton button = new TextButton(buttonText, textButtonStyle);
 		button.setPosition(xPosition, yPosition);
 		//this uses the buttonMap to get the correct method to run once a button is clicked
@@ -292,18 +295,17 @@ public class Slapjack extends ApplicationAdapter {
 	}
 	
 	//this method is used to create a slider
-	private Slider getSlider(String sliderText, int xPosition, 
-			int yPosition, final String id, SliderStyle sliderStyle) {
-		Slider sliders = new Slider(xPosition, yPosition, 1, false, sliderStyle);
-		sliders.setPosition(xPosition, yPosition);
-		sliders.addListener(new ClickListener(){
-			public void clicked(InputEvent event, float x, float y) {
-				buttonMap.get(id).run();
-			}
-		});
-		return sliders;
-	}
-	
+	//	private Slider getSlider(String sliderText, int xPosition, 
+	//			int yPosition, final String id, SliderStyle sliderStyle) {
+	//		Slider sliders = new Slider(xPosition, yPosition, 1, false, sliderStyle);
+	//		sliders.setPosition(xPosition, yPosition);
+	//		sliders.addListener(new ClickListener(){
+	//			public void clicked(InputEvent event, float x, float y) {
+	//				buttonMap.get(id).run();
+	//			}
+	//		});
+	//		return sliders;
+	//	}
 	
 	 /*******************************
 	 * Animation Methods
@@ -312,12 +314,25 @@ public class Slapjack extends ApplicationAdapter {
 	private void stopDealAnimation() {		
 		//multiple player animations
 		Vector2 targetPositions[] = new Vector2[numPlayers];
-		int margin = ((1080 - (cardBackTexture.getWidth() * (numPlayers-1))) / numPlayers) / 2;
+		int margin = 1080;
+		if(numPlayers == 2){
+			margin = ((1080 - cardBackTexture.getWidth()) / 2);
+		}
+		else if(numPlayers == 3){
+			margin = (360 - (cardBackTexture.getWidth() / 2));
+		}else {
+			margin = ((1080 - (cardBackTexture.getWidth() * (numPlayers-1))) / numPlayers) / 2;
+		}
 		
 		for(int i = 1; i < numPlayers; i++){
-			targetPositions[i] = new Vector2((i-1) * ((1080 + margin) / (numPlayers - 1)) + margin , MAX_HEIGHT);
+			if(numPlayers == 3) {
+				targetPositions[i] = new Vector2((i-1) * ((1080 + margin) / (numPlayers - 1)) + margin / 2 , MAX_HEIGHT);
+			}
+			else {
+				targetPositions[i] = new Vector2((i-1) * ((1080 + margin) / (numPlayers - 1)) + margin , MAX_HEIGHT);
+			}
 			cardBackSprites[i].setPosition(targetPositions[i].x, targetPositions[i].y);
-		}
+		}		
 	}
 
 	private void dealAnimation(int numPlayers) {
@@ -325,12 +340,31 @@ public class Slapjack extends ApplicationAdapter {
 		//target positions and movement positions
 		Vector2 targetPositions[] = new Vector2[numPlayers];
 		Vector2 movementPositions[] = new Vector2[numPlayers];
-		int margin = ((1080 - (cardBackTexture.getWidth() * (numPlayers-1))) / numPlayers) / 2;
+		int margin = 1080;
+		if(numPlayers == 2) {
+			margin = ((1080 - cardBackTexture.getWidth()) / 2);
+		}
+		else if(numPlayers == 3) {
+			margin = (360 - (cardBackTexture.getWidth() / 2));
+		}
+		else {
+			margin = ((1080 - (cardBackTexture.getWidth() * (numPlayers-1))) / numPlayers) / 2;
+		}
+		
+		
+		//target and movement positions for the human player's card
+		targetPositions[0] = new Vector2((Gdx.graphics.getWidth()-cardBackSprites[0].getWidth())/2, (Gdx.graphics.getHeight()-cardBackSprites[0].getHeight())/2);
+		movementPositions[0] = new Vector2();
 		
 		targetPositions[0] = new Vector2((Gdx.graphics.getWidth()-cardBackSprites[0].getWidth())/2, (Gdx.graphics.getHeight()-cardBackSprites[1].getHeight())/10);
 		movementPositions[0] = new Vector2();
 		for(int i = 1; i < numPlayers; i++){
-			targetPositions[i] = new Vector2((i-1) * ((1080 + margin) / (numPlayers - 1)) + margin , MAX_HEIGHT);
+			if(numPlayers == 3) {
+				targetPositions[i] = new Vector2((i-1) * ((1080 + margin) / (numPlayers - 1)) + margin / 2 , MAX_HEIGHT);
+			}
+			else {
+				targetPositions[i] = new Vector2((i-1) * ((1080 + margin) / (numPlayers - 1)) + margin , MAX_HEIGHT);
+			}
 			movementPositions[i] = new Vector2();
 		}
 		
@@ -342,10 +376,15 @@ public class Slapjack extends ApplicationAdapter {
 		//move the cards
 		for(int i = 1; i < numPlayers; i++){
 			if(cardBackSprites[i].getX() < targetPositions[i].x){
-				movementPositions[i].x = cardBackSprites[i].getX() + xMovement;
+				movementPositions[i].x = cardBackSprites[i].getX() + xMovement;				
 			}
 			else if(cardBackSprites[i].getX() > targetPositions[i].x){
 				movementPositions[i].x = cardBackSprites[i].getX() - xMovement;
+			}
+			
+			if(Math.abs(cardBackSprites[i].getX() - targetPositions[i].x) < 1 )
+			{
+				movementPositions[i].x = targetPositions[i].x;
 			}
 			
 			if(cardBackSprites[i].getY() < targetPositions[i].y){
@@ -354,9 +393,15 @@ public class Slapjack extends ApplicationAdapter {
 			cardBackSprites[i].setPosition(movementPositions[i].x, movementPositions[i].y);
 		}
 		
+
 		// for the human player's card		
-		if(cardBackSprites[0].getY() < targetPositions[0].y){
-			movementPositions[0].y = cardBackSprites[0].getY() + yMovementHuman;
+//		if(cardBackSprites[0].getY() < targetPositions[0].y){
+//			movementPositions[0].y = cardBackSprites[0].getY() + yMovementHuman;
+
+		// special for the human player's card		
+		if(cardBackSprites[0].getY() <= targetPositions[0].y){
+			movementPositions[0].y = cardBackSprites[0].getY() - yMovementHuman;
+
 		} else {
 			yMovementHuman = 0;
 		}
@@ -392,8 +437,7 @@ public class Slapjack extends ApplicationAdapter {
 	// run in the render method to see if the most recently played card is a jack 
 	public void checkForJack() {
 		if(cardStack.size() > 0){
-			Card currCard = cardStack.get(cardStack.size() - 1);
-			if(currCard.getRank() == "JACK"){
+			if(cardStack.get(cardStack.size() - 1).getRank() == "JACK"){
 				jackPlayed = true;
 			}
 		}
@@ -414,12 +458,11 @@ public class Slapjack extends ApplicationAdapter {
 		if(Gdx.input.isTouched()){
 			int x1 = Gdx.input.getX();
 			int y1 = Gdx.input.getY();
-			// TODO: determine the location for the cardStack
-			// TODO: pull code from the checkForCardPlay function
-			int xMin = 0;
-			int xMax = 100;
-			int yMin = 0;
-			int yMax = 100;
+			//Target of the discard pile
+			int xMin = (Gdx.graphics.getWidth()-cardBackTexture.getWidth())/2;
+			int xMax = (Gdx.graphics.getWidth()+cardBackTexture.getWidth())/2;
+			int yMin = (Gdx.graphics.getHeight()-cardBackTexture.getHeight())/2;
+			int yMax = (Gdx.graphics.getHeight()+cardBackTexture.getHeight())/2;
 			System.out.println("X: "+ x1 + " Y: "+y1);
 			
 			//within the boundaries
@@ -445,20 +488,16 @@ public class Slapjack extends ApplicationAdapter {
 		if(Gdx.input.isTouched()){
 			int x1 = Gdx.input.getX();
 			int y1 = Gdx.input.getY();
-			// TODO: determine the location for the cardStack, right now it is in the middle of the window
+			// TODO: determine the location for the cardStack, 
 			int xMin = (Gdx.graphics.getWidth()-cardBackTexture.getWidth())/2;
-			int xMax = (Gdx.graphics.getWidth()+cardBackTexture.getWidth())/2;;
-			int yMin = (Gdx.graphics.getHeight()-cardBackTexture.getHeight())/2;;
-			int yMax = (Gdx.graphics.getHeight()+cardBackTexture.getHeight())/2;;
-			//System.out.println("X: "+ x1 + " Y: "+y1);
+			int xMax = (Gdx.graphics.getWidth()+cardBackTexture.getWidth())/2;
+			int yMin = (Gdx.graphics.getHeight()-cardBackTexture.getHeight())/10;
+			int yMax = (Gdx.graphics.getHeight()+cardBackTexture.getHeight())/10;
 			
 			//within the boundaries
 			if(x1 > xMin && x1 < xMax && y1 > yMin && y1 < yMax){
-				    //get the player who slapped and call their slap method to determine validity
-					// right now this method is only called by the single human player so we might not need to get them
 					System.out.println("Player played card");
-					testWhatCardsAreOnTheBoard();
-					return true;
+					players.get(0).playCard();
 			}
 		}
 		return false;
