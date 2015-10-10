@@ -18,13 +18,17 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
+import com.badlogic.gdx.scenes.scene2d.InputListener;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.Label.LabelStyle;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
+import com.badlogic.gdx.scenes.scene2d.ui.Slider;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton.TextButtonStyle;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
+import com.badlogic.gdx.scenes.scene2d.ui.ProgressBar.ProgressBarStyle;
+import com.badlogic.gdx.scenes.scene2d.ui.Slider.SliderStyle;
 
 public class Slapjack extends ApplicationAdapter {
 	public enum GamePhases{ TITLE_SCREEN, DEAL, GAME_PLAY, WINNER }
@@ -60,12 +64,16 @@ public class Slapjack extends ApplicationAdapter {
 	private Skin skin;
 	private BitmapFont bitmapfont;
 	private TextButtonStyle textButtonStyle;
+	private SliderStyle sliderStyle;
 	
 	private HashMap<String, Runnable> buttonMap = new HashMap<String, Runnable>();
 	private TextButton playGameButton;
 	private TextButton playCardButton;
 	private TextButton resetGameButton;
 	private TextButton testCardStack;
+	private Slider numOfPlayerSlider;
+	private Slider difficultySlider;
+	private Slider resetSlider;
 	
 	//Don't delete!
 	@Override
@@ -75,8 +83,9 @@ public class Slapjack extends ApplicationAdapter {
 		numPlayers = 7;
 		players = new ArrayList<Player>();
 		cardStack = new ArrayList<Card>();
+		lastToPlay = players.get(0);
+		
 		batch = new SpriteBatch();
-		lastToPlay = null;
 		
 		//background
 		background = new Texture(Gdx.files.internal("rustic_background.jpg"));
@@ -118,12 +127,24 @@ public class Slapjack extends ApplicationAdapter {
 		textButtonStyle.down = skin.newDrawable("buttonDown");
 		textButtonStyle.font = skin.getFont("default");
 		
+		//TODO, DO WE NEED THIS? NOT SURE HOW ITS IMPLEMENTED ON THE GUI
+		sliderStyle = new SliderStyle();
+		sliderStyle.knobAfter = skin.newDrawable("buttonDown");
+		sliderStyle.knobBefore = skin.newDrawable("buttonUp");
+
 		//create buttons
 		playGameButton = getButton("Play Game", (Gdx.graphics.getWidth()-buttonTexture.getWidth())/2, 75, "playGameButton", textButtonStyle);
 		playCardButton = getButton("Play Card", (Gdx.graphics.getWidth()-buttonTexture.getWidth())/2, 75, "playCardButton", textButtonStyle);
 		resetGameButton = getButton("Reset", (Gdx.graphics.getWidth()-buttonTexture.getWidth())/2, 75, "resetGameButton", textButtonStyle);
 		testCardStack = getButton("Test Card Stack", 200, 75, "testCardStack", textButtonStyle);
 		
+		//create sliders
+		//TODO we need to add the slider for number of players and difficulty
+		//Trying to figure out if we need to create a skin for the slider.
+		numOfPlayerSlider = getSlider("Number of Players", (Gdx.graphics.getWidth()-buttonTexture.getWidth())/2, 75, "numOfPlayerSlider", sliderStyle);
+		difficultySlider = getSlider("Level of Difficulty", (Gdx.graphics.getWidth()-buttonTexture.getWidth())/2, 75, "difficultySlider", sliderStyle);
+		resetSlider = getSlider("Reset", (Gdx.graphics.getWidth()-buttonTexture.getWidth())/2, 75, "resetSlider", sliderStyle);
+
 		//add buttons to map
 		buttonMap.put("playGameButton", new Runnable(){
 			public void run() {
@@ -144,7 +165,6 @@ public class Slapjack extends ApplicationAdapter {
 				//method called when the button is clicked
 			}
 		});
-		
 		buttonMap.put("testCardStack", new Runnable(){
 			public void run() {
 				testWhatCardsAreOnTheBoard();
@@ -156,6 +176,26 @@ public class Slapjack extends ApplicationAdapter {
 		stage.addActor(playCardButton);
 		stage.addActor(testCardStack);
 		endStage.addActor(resetGameButton);
+		
+		//TODO COMPLETE
+		//add sliders to map
+		/*buttonMap.put("numOfPlayerSlider", new Runnable() {
+			public void run(){
+				
+			}
+		});
+		buttonMap.put("difficultySlider", new Runnable() {
+			public void run(){
+				
+			}
+		});
+		buttonMap.put("resetSlider", new Runnable() {
+			public void run(){
+				
+			}
+		});*/
+		
+		//add sliders to stage
 	}
 
 	//Don't delete! Used for drawing on the screen
@@ -249,6 +289,19 @@ public class Slapjack extends ApplicationAdapter {
 			}
 		});
 		return button;
+	}
+	
+	//this method is used to create a slider
+	private Slider getSlider(String sliderText, int xPosition, 
+			int yPosition, final String id, SliderStyle sliderStyle) {
+		Slider sliders = new Slider(xPosition, yPosition, 1, false, sliderStyle);
+		sliders.setPosition(xPosition, yPosition);
+		sliders.addListener(new ClickListener(){
+			public void clicked(InputEvent event, float x, float y) {
+				buttonMap.get(id).run();
+			}
+		});
+		return sliders;
 	}
 	
 	
@@ -362,14 +415,15 @@ public class Slapjack extends ApplicationAdapter {
 			int x1 = Gdx.input.getX();
 			int y1 = Gdx.input.getY();
 			// TODO: determine the location for the cardStack
-			int xMin = (Gdx.graphics.getWidth()-cardBackTexture.getWidth())/2;  //Changed slap area to center stack
-			int xMax = (Gdx.graphics.getWidth()+cardBackTexture.getWidth())/2;;
-			int yMin = (Gdx.graphics.getHeight()-cardBackTexture.getHeight())/2;;
-			int yMax = (Gdx.graphics.getHeight()+cardBackTexture.getHeight())/2;;  
+			// TODO: pull code from the checkForCardPlay function
+			int xMin = 0;
+			int xMax = 100;
+			int yMin = 0;
+			int yMax = 100;
 			System.out.println("X: "+ x1 + " Y: "+y1);
 			
 			//within the boundaries
-			if(x1 > xMin && x1 < xMax && y1 > yMin && y1 < yMax && cardStack.size() != 0){
+			if(x1 > xMin && x1 < xMax && y1 > yMin && y1 < yMax){
 				    //get the player who slapped and call their slap method to determine validity
 					String topCard = cardStack.get(cardStack.size()-1).getRank();
 					if(players.get(0).slap(topCard)){
@@ -381,7 +435,6 @@ public class Slapjack extends ApplicationAdapter {
 						//gives a card to the last person to play if slap was incorrect
 						lastToPlay.addToHand(players.get(0).giveUpCard());
 					}
-					
 			}
 		}
 	}
