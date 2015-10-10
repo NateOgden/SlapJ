@@ -286,18 +286,17 @@ public class Slapjack extends ApplicationAdapter {
 	}
 	
 	//this method is used to create a slider
-//	private Slider getSlider(String sliderText, int xPosition, 
-//			int yPosition, final String id, SliderStyle sliderStyle) {
-//		Slider sliders = new Slider(xPosition, yPosition, 1, false, sliderStyle);
-//		sliders.setPosition(xPosition, yPosition);
-//		sliders.addListener(new ClickListener(){
-//			public void clicked(InputEvent event, float x, float y) {
-//				buttonMap.get(id).run();
-//			}
-//		});
-//		return sliders;
-//	}
-	
+	//	private Slider getSlider(String sliderText, int xPosition, 
+	//			int yPosition, final String id, SliderStyle sliderStyle) {
+	//		Slider sliders = new Slider(xPosition, yPosition, 1, false, sliderStyle);
+	//		sliders.setPosition(xPosition, yPosition);
+	//		sliders.addListener(new ClickListener(){
+	//			public void clicked(InputEvent event, float x, float y) {
+	//				buttonMap.get(id).run();
+	//			}
+	//		});
+	//		return sliders;
+	//	}
 	
 	 /*******************************
 	 * Animation Methods
@@ -317,12 +316,10 @@ public class Slapjack extends ApplicationAdapter {
 		}
 		
 		for(int i = 1; i < numPlayers; i++){
-			if(numPlayers == 3)
-			{
+			if(numPlayers == 3) {
 				targetPositions[i] = new Vector2((i-1) * ((1080 + margin) / (numPlayers - 1)) + margin / 2 , MAX_HEIGHT);
 			}
-			else
-			{
+			else {
 				targetPositions[i] = new Vector2((i-1) * ((1080 + margin) / (numPlayers - 1)) + margin , MAX_HEIGHT);
 			}
 			cardBackSprites[i].setPosition(targetPositions[i].x, targetPositions[i].y);
@@ -335,16 +332,13 @@ public class Slapjack extends ApplicationAdapter {
 		Vector2 targetPositions[] = new Vector2[numPlayers];
 		Vector2 movementPositions[] = new Vector2[numPlayers];
 		int margin = 1080;
-		if(numPlayers == 2)
-		{
+		if(numPlayers == 2) {
 			margin = ((1080 - cardBackTexture.getWidth()) / 2);
 		}
-		else if(numPlayers == 3)
-		{
+		else if(numPlayers == 3) {
 			margin = (360 - (cardBackTexture.getWidth() / 2));
 		}
-		else
-		{
+		else {
 			margin = ((1080 - (cardBackTexture.getWidth() * (numPlayers-1))) / numPlayers) / 2;
 		}
 		
@@ -354,12 +348,10 @@ public class Slapjack extends ApplicationAdapter {
 		movementPositions[0] = new Vector2();
 		
 		for(int i = 1; i < numPlayers; i++){
-			if(numPlayers == 3)
-			{
+			if(numPlayers == 3) {
 				targetPositions[i] = new Vector2((i-1) * ((1080 + margin) / (numPlayers - 1)) + margin / 2 , MAX_HEIGHT);
 			}
-			else
-			{
+			else {
 				targetPositions[i] = new Vector2((i-1) * ((1080 + margin) / (numPlayers - 1)) + margin , MAX_HEIGHT);
 			}
 			movementPositions[i] = new Vector2();
