@@ -75,9 +75,8 @@ public class Slapjack extends ApplicationAdapter {
 		numPlayers = 7;
 		players = new ArrayList<Player>();
 		cardStack = new ArrayList<Card>();
-		lastToPlay = players.get(0);
-		
 		batch = new SpriteBatch();
+		lastToPlay = null;
 		
 		//background
 		background = new Texture(Gdx.files.internal("rustic_background.jpg"));
@@ -354,7 +353,7 @@ public class Slapjack extends ApplicationAdapter {
 			System.out.println("X: "+ x1 + " Y: "+y1);
 			
 			//within the boundaries
-			if(x1 > xMin && x1 < xMax && y1 > yMin && y1 < yMax){
+			if(x1 > xMin && x1 < xMax && y1 > yMin && y1 < yMax && cardStack.size() != 0){
 				    //get the player who slapped and call their slap method to determine validity
 					String topCard = cardStack.get(cardStack.size()-1).getRank();
 					if(players.get(0).slap(topCard)){
