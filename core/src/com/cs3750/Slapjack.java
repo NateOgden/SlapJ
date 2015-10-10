@@ -119,7 +119,6 @@ public class Slapjack extends ApplicationAdapter {
 		textButtonStyle.font = skin.getFont("default");
 		
 		//create buttons
-		//TODO second argument needs dynamic width for the width of the button, right now it is hard coded at 110
 		playGameButton = getButton("Play Game", (Gdx.graphics.getWidth()-buttonTexture.getWidth())/2, 75, "playGameButton", textButtonStyle);
 		playCardButton = getButton("Play Card", (Gdx.graphics.getWidth()-buttonTexture.getWidth())/2, 75, "playCardButton", textButtonStyle);
 		resetGameButton = getButton("Reset", (Gdx.graphics.getWidth()-buttonTexture.getWidth())/2, 75, "resetGameButton", textButtonStyle);
