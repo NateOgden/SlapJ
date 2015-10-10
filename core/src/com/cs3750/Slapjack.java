@@ -61,6 +61,8 @@ public class Slapjack extends ApplicationAdapter {
 	
 	private HashMap<String, Runnable> buttonMap = new HashMap<String, Runnable>();
 	private TextButton playGameButton;
+	private TextButton playCardButton;
+	private TextButton resetGameButton;
 	private TextButton testCardStack;
 	
 	//Don't delete!
@@ -100,11 +102,13 @@ public class Slapjack extends ApplicationAdapter {
 		MIN_WIDTH = 175;
 		
 		//button style
+		Texture buttonTexture = new Texture(Gdx.files.internal("button.png"));
+		Texture buttonDownTexture = new Texture(Gdx.files.internal("buttonDown.png"));
 		bitmapfont = new BitmapFont();
 		skin = new Skin();
 		skin.add("default", bitmapfont);
-		skin.add("buttonUp", new Texture(Gdx.files.internal("button.png")));
-		skin.add("buttonDown", new Texture(Gdx.files.internal("buttonDown.png")));
+		skin.add("buttonUp", buttonTexture);
+		skin.add("buttonDown", buttonDownTexture);
 		
 		textButtonStyle = new TextButtonStyle();
 		textButtonStyle.up = skin.newDrawable("buttonUp");
@@ -113,7 +117,9 @@ public class Slapjack extends ApplicationAdapter {
 		
 		//create buttons
 		//TODO second argument needs dynamic width for the width of the button, right now it is hard coded at 110
-		playGameButton = getButton("Play Game", (Gdx.graphics.getWidth()-110)/2, 75, "playGameButton", textButtonStyle);
+		playGameButton = getButton("Play Game", (Gdx.graphics.getWidth()-buttonTexture.getWidth())/2, 75, "playGameButton", textButtonStyle);
+		playCardButton = getButton("Play Card", (Gdx.graphics.getWidth()-buttonTexture.getWidth())/2, 75, "playCardButton", textButtonStyle);
+		resetGameButton = getButton("Reset", (Gdx.graphics.getWidth()-buttonTexture.getWidth())/2, 75, "resetGameButton", textButtonStyle);
 		testCardStack = getButton("Test Card Stack", 200, 75, "playGameButton", textButtonStyle);
 		
 		//add buttons to map
@@ -126,6 +132,16 @@ public class Slapjack extends ApplicationAdapter {
 				playGame();
 			}
 		});
+		buttonMap.put("playCardButton", new Runnable(){
+			public void run() {
+				//method called when the button is clicked
+			}
+		});
+		buttonMap.put("resetGameButton", new Runnable(){
+			public void run() {
+				//method called when the button is clicked
+			}
+		});
 		
 		buttonMap.put("testCardStack", new Runnable(){
 			public void run() {
@@ -134,8 +150,10 @@ public class Slapjack extends ApplicationAdapter {
 		});
 		
 		//add actors to stage
-		stage.addActor(playGameButton);
+		startStage.addActor(playGameButton);
+		stage.addActor(playCardButton);
 		stage.addActor(testCardStack);
+		endStage.addActor(resetGameButton);
 	}
 
 	//Don't delete! Used for drawing on the screen
@@ -150,12 +168,12 @@ public class Slapjack extends ApplicationAdapter {
 			s.draw(batch);
 		}
 		batch.end();
-		Gdx.input.setInputProcessor(stage); 
-		stage.draw();
+		
 		
 		if(gamePhase == GamePhases.TITLE_SCREEN){
-			
-		} 
+			Gdx.input.setInputProcessor(startStage); 
+			startStage.draw();
+		}
 		
 		if(gamePhase == GamePhases.DEAL && timer >= 4.5f){
 			stopDealAnimation();
@@ -167,6 +185,9 @@ public class Slapjack extends ApplicationAdapter {
 		}
 		
 		if(gamePhase == GamePhases.GAME_PLAY){
+			Gdx.input.setInputProcessor(stage); 
+			stage.draw();
+		
 			//always checking to see if a Jack has been played
 			//checkForJack();
 			
@@ -198,7 +219,8 @@ public class Slapjack extends ApplicationAdapter {
 		
 		
 		if(gamePhase == GamePhases.WINNER){
-			
+			Gdx.input.setInputProcessor(endStage); 
+			endStage.draw();
 		}
 	}
 
@@ -382,6 +404,3 @@ public class Slapjack extends ApplicationAdapter {
 	}
 	
 }
-
-
-
