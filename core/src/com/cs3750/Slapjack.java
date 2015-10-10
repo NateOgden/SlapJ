@@ -128,8 +128,6 @@ public class Slapjack extends ApplicationAdapter {
 		
 		//TODO, DO WE NEED THIS? NOT SURE HOW ITS IMPLEMENTED ON THE GUI
 		sliderStyle = new SliderStyle();
-		sliderStyle.knobAfter = skin.newDrawable("buttonDown");
-		sliderStyle.knobBefore = skin.newDrawable("buttonUp");
 
 		//create buttons
 		playGameButton = getButton("Play Game", (Gdx.graphics.getWidth()-buttonTexture.getWidth())/2, 75, "playGameButton", textButtonStyle);
@@ -138,8 +136,8 @@ public class Slapjack extends ApplicationAdapter {
 		testCardStack = getButton("Test Card Stack", 200, 75, "testCardStack", textButtonStyle);
 		
 		//create sliders
-		//TODO we need to add the slider for number of players and difficulty
-		//Trying to figure out if we need to create a skin for the slider.
+		//TODO we need to add the slider for number of players, difficulty, and reset
+		//Do we need to create a skin for the slider?
 		numOfPlayerSlider = getSlider("Number of Players", (Gdx.graphics.getWidth()-buttonTexture.getWidth())/2, 75, "numOfPlayerSlider", sliderStyle);
 		difficultySlider = getSlider("Level of Difficulty", (Gdx.graphics.getWidth()-buttonTexture.getWidth())/2, 75, "difficultySlider", sliderStyle);
 		resetSlider = getSlider("Reset", (Gdx.graphics.getWidth()-buttonTexture.getWidth())/2, 75, "resetSlider", sliderStyle);
