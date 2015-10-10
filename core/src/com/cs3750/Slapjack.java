@@ -164,7 +164,6 @@ public class Slapjack extends ApplicationAdapter {
 				//method called when the button is clicked
 			}
 		});
-		
 		buttonMap.put("testCardStack", new Runnable(){
 			public void run() {
 				testWhatCardsAreOnTheBoard();
@@ -399,6 +398,7 @@ public class Slapjack extends ApplicationAdapter {
 			int x1 = Gdx.input.getX();
 			int y1 = Gdx.input.getY();
 			// TODO: determine the location for the cardStack
+			// TODO: pull code from the checkForCardPlay function
 			int xMin = 0;
 			int xMax = 100;
 			int yMin = 0;
