@@ -145,9 +145,9 @@ public class Slapjack extends ApplicationAdapter {
 		//create sliders
 		//TODO we need to add the slider for number of players, difficulty, and reset
 		//Do we need to create a skin for the slider?
-//		numOfPlayerSlider = getSlider("Number of Players", (Gdx.graphics.getWidth()-buttonTexture.getWidth())/2, 75, "numOfPlayerSlider", sliderStyle);
-//		difficultySlider = getSlider("Level of Difficulty", (Gdx.graphics.getWidth()-buttonTexture.getWidth())/2, 75, "difficultySlider", sliderStyle);
-//		resetSlider = getSlider("Reset", (Gdx.graphics.getWidth()-buttonTexture.getWidth())/2, 75, "resetSlider", sliderStyle);
+		//numOfPlayerSlider = getSlider("Number of Players", (Gdx.graphics.getWidth()-buttonTexture.getWidth())/2, 75, "numOfPlayerSlider", sliderStyle);
+		//difficultySlider = getSlider("Level of Difficulty", (Gdx.graphics.getWidth()-buttonTexture.getWidth())/2, 75, "difficultySlider", sliderStyle);
+		//resetSlider = getSlider("Reset", (Gdx.graphics.getWidth()-buttonTexture.getWidth())/2, 75, "resetSlider", sliderStyle);
 
 		//add buttons to map
 		buttonMap.put("playGameButton", new Runnable(){
@@ -526,7 +526,6 @@ public class Slapjack extends ApplicationAdapter {
 		if(Gdx.input.isTouched()){
 			int x1 = Gdx.input.getX();
 			int y1 = Gdx.input.getY();
-			// TODO: determine the location for the cardStack, 
 			int xMin = (Gdx.graphics.getWidth()-cardBackTexture.getWidth())/2;
 			int xMax = (Gdx.graphics.getWidth()+cardBackTexture.getWidth())/2;
 			int yMin = ((Gdx.graphics.getHeight()/2)-cardBackTexture.getHeight()+50);
