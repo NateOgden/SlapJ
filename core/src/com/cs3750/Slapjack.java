@@ -231,7 +231,7 @@ public class Slapjack extends ApplicationAdapter {
 			stage.draw();
 		
 			//always checking to see if a Jack has been played
-			//checkForJack();
+			checkForJack();
 			
 			//always checking to see if a slap has happened
 			checkForSlap();
@@ -257,7 +257,6 @@ public class Slapjack extends ApplicationAdapter {
 			}	
 		}
 		
-		
 		if(gamePhase == GamePhases.WINNER){
 			Gdx.input.setInputProcessor(endStage); 
 			endStage.draw();
@@ -274,8 +273,7 @@ public class Slapjack extends ApplicationAdapter {
 	 * Visual Component Methods
 	 ********************************/
 	//this method is used to create a button
-	private TextButton getButton(String buttonText, int xPosition,
-			int yPosition, final String id, TextButtonStyle textButtonStyle) {
+	private TextButton getButton(String buttonText, int xPosition, int yPosition, final String id, TextButtonStyle textButtonStyle) {
 		TextButton button = new TextButton(buttonText, textButtonStyle);
 		button.setPosition(xPosition, yPosition);
 		//this uses the buttonMap to get the correct method to run once a button is clicked
@@ -309,16 +307,12 @@ public class Slapjack extends ApplicationAdapter {
 		//multiple player animations
 		Vector2 targetPositions[] = new Vector2[numPlayers];
 		int margin = 1080;
-		if(numPlayers == 2)
-		{
+		if(numPlayers == 2){
 			margin = ((1080 - cardBackTexture.getWidth()) / 2);
 		}
-		else if(numPlayers == 3)
-		{
+		else if(numPlayers == 3){
 			margin = (360 - (cardBackTexture.getWidth() / 2));
-		}
-		else
-		{
+		}else {
 			margin = ((1080 - (cardBackTexture.getWidth() * (numPlayers-1))) / numPlayers) / 2;
 		}
 		
@@ -434,8 +428,7 @@ public class Slapjack extends ApplicationAdapter {
 	// run in the render method to see if the most recently played card is a jack 
 	public void checkForJack() {
 		if(cardStack.size() > 0){
-			Card currCard = cardStack.get(cardStack.size() - 1);
-			if(currCard.getRank() == "JACK"){
+			if(cardStack.get(cardStack.size() - 1).getRank() == "JACK"){
 				jackPlayed = true;
 			}
 		}
@@ -456,12 +449,11 @@ public class Slapjack extends ApplicationAdapter {
 		if(Gdx.input.isTouched()){
 			int x1 = Gdx.input.getX();
 			int y1 = Gdx.input.getY();
-			// TODO: determine the location for the cardStack
-			// TODO: pull code from the checkForCardPlay function
-			int xMin = 0;
-			int xMax = 100;
-			int yMin = 0;
-			int yMax = 100;
+			//Target of the discard pile
+			int xMin = (Gdx.graphics.getWidth()-cardBackTexture.getWidth())/2;
+			int xMax = (Gdx.graphics.getWidth()+cardBackTexture.getWidth())/2;
+			int yMin = (Gdx.graphics.getHeight()-cardBackTexture.getHeight())/2;
+			int yMax = (Gdx.graphics.getHeight()+cardBackTexture.getHeight())/2;
 			System.out.println("X: "+ x1 + " Y: "+y1);
 			
 			//within the boundaries
@@ -487,20 +479,16 @@ public class Slapjack extends ApplicationAdapter {
 		if(Gdx.input.isTouched()){
 			int x1 = Gdx.input.getX();
 			int y1 = Gdx.input.getY();
-			// TODO: determine the location for the cardStack, right now it is in the middle of the window
+			// TODO: determine the location for the cardStack, 
 			int xMin = (Gdx.graphics.getWidth()-cardBackTexture.getWidth())/2;
-			int xMax = (Gdx.graphics.getWidth()+cardBackTexture.getWidth())/2;;
-			int yMin = (Gdx.graphics.getHeight()-cardBackTexture.getHeight())/2;;
-			int yMax = (Gdx.graphics.getHeight()+cardBackTexture.getHeight())/2;;
-			//System.out.println("X: "+ x1 + " Y: "+y1);
+			int xMax = (Gdx.graphics.getWidth()+cardBackTexture.getWidth())/2;
+			int yMin = (Gdx.graphics.getHeight()-cardBackTexture.getHeight())/10;
+			int yMax = (Gdx.graphics.getHeight()+cardBackTexture.getHeight())/10;
 			
 			//within the boundaries
 			if(x1 > xMin && x1 < xMax && y1 > yMin && y1 < yMax){
-				    //get the player who slapped and call their slap method to determine validity
-					// right now this method is only called by the single human player so we might not need to get them
 					System.out.println("Player played card");
-					testWhatCardsAreOnTheBoard();
-					return true;
+					players.get(0).playCard();
 			}
 		}
 		return false;

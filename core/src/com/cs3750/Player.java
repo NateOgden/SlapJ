@@ -1,10 +1,8 @@
 package com.cs3750;
 
 import java.util.ArrayList;
-import java.util.List;
 
 public class Player {
-	private static final int NUMBER_OF_STACKS = 1;
 	private boolean canSlapIn;
 	private ArrayList<Card> hand; 
 	
