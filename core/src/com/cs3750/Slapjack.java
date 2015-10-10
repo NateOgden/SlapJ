@@ -81,7 +81,7 @@ public class Slapjack extends ApplicationAdapter {
 	public void create () {	
 		
 		//environment variables
-		numPlayers = 7;
+		numPlayers = 3;
 		players = new ArrayList<Player>();
 		cardStack = new ArrayList<Card>();
 		lastToPlay = null;
@@ -308,10 +308,29 @@ public class Slapjack extends ApplicationAdapter {
 	private void stopDealAnimation() {		
 		//multiple player animations
 		Vector2 targetPositions[] = new Vector2[numPlayers];
-		int margin = ((1080 - (cardBackTexture.getWidth() * (numPlayers-1))) / numPlayers) / 2;
+		int margin = 1080;
+		if(numPlayers == 2)
+		{
+			margin = ((1080 - cardBackTexture.getWidth()) / 2);
+		}
+		else if(numPlayers == 3)
+		{
+			margin = (360 - (cardBackTexture.getWidth() / 2));
+		}
+		else
+		{
+			margin = ((1080 - (cardBackTexture.getWidth() * (numPlayers-1))) / numPlayers) / 2;
+		}
 		
 		for(int i = 1; i < numPlayers; i++){
-			targetPositions[i] = new Vector2((i-1) * ((1080 + margin) / (numPlayers - 1)) + margin , MAX_HEIGHT);
+			if(numPlayers == 3)
+			{
+				targetPositions[i] = new Vector2((i-1) * ((1080 + margin) / (numPlayers - 1)) + margin / 2 , MAX_HEIGHT);
+			}
+			else
+			{
+				targetPositions[i] = new Vector2((i-1) * ((1080 + margin) / (numPlayers - 1)) + margin , MAX_HEIGHT);
+			}
 			cardBackSprites[i].setPosition(targetPositions[i].x, targetPositions[i].y);
 		}		
 	}
@@ -321,14 +340,34 @@ public class Slapjack extends ApplicationAdapter {
 		//target positions and movement positions
 		Vector2 targetPositions[] = new Vector2[numPlayers];
 		Vector2 movementPositions[] = new Vector2[numPlayers];
-		int margin = ((1080 - (cardBackTexture.getWidth() * (numPlayers-1))) / numPlayers) / 2;
+		int margin = 1080;
+		if(numPlayers == 2)
+		{
+			margin = ((1080 - cardBackTexture.getWidth()) / 2);
+		}
+		else if(numPlayers == 3)
+		{
+			margin = (360 - (cardBackTexture.getWidth() / 2));
+		}
+		else
+		{
+			margin = ((1080 - (cardBackTexture.getWidth() * (numPlayers-1))) / numPlayers) / 2;
+		}
+		
 		
 		//target and movement positions for the human player's card
 		targetPositions[0] = new Vector2((Gdx.graphics.getWidth()-cardBackSprites[0].getWidth())/2, (Gdx.graphics.getHeight()-cardBackSprites[0].getHeight())/2);
 		movementPositions[0] = new Vector2();
 		
 		for(int i = 1; i < numPlayers; i++){
-			targetPositions[i] = new Vector2((i-1) * ((1080 + margin) / (numPlayers - 1)) + margin , MAX_HEIGHT);
+			if(numPlayers == 3)
+			{
+				targetPositions[i] = new Vector2((i-1) * ((1080 + margin) / (numPlayers - 1)) + margin / 2 , MAX_HEIGHT);
+			}
+			else
+			{
+				targetPositions[i] = new Vector2((i-1) * ((1080 + margin) / (numPlayers - 1)) + margin , MAX_HEIGHT);
+			}
 			movementPositions[i] = new Vector2();
 		}
 		
@@ -340,10 +379,15 @@ public class Slapjack extends ApplicationAdapter {
 		//move the cards
 		for(int i = 1; i < numPlayers; i++){
 			if(cardBackSprites[i].getX() < targetPositions[i].x){
-				movementPositions[i].x = cardBackSprites[i].getX() + xMovement;
+				movementPositions[i].x = cardBackSprites[i].getX() + xMovement;				
 			}
 			else if(cardBackSprites[i].getX() > targetPositions[i].x){
 				movementPositions[i].x = cardBackSprites[i].getX() - xMovement;
+			}
+			
+			if(Math.abs(cardBackSprites[i].getX() - targetPositions[i].x) < 1 )
+			{
+				movementPositions[i].x = targetPositions[i].x;
 			}
 			
 			if(cardBackSprites[i].getY() < targetPositions[i].y){
