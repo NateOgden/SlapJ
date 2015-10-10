@@ -93,10 +93,11 @@ public class Slapjack extends ApplicationAdapter {
 		cardBackTexture = new Texture(Gdx.files.internal("cardback.png"));
 		
 		cardBackSprites = new Sprite[numPlayers];
-		for(int i = 0; i < numPlayers; i++){
+		for(int i = 0; i < numPlayers; i++){	
 			cardBackSprites[i] = new Sprite(cardBackTexture);
 			cardBackSprites[i].setPosition((Gdx.graphics.getWidth()-cardBackSprites[i].getWidth())/2, (Gdx.graphics.getHeight()-cardBackSprites[i].getHeight())/2);
 		}
+		
 			
 		MAX_HEIGHT = Gdx.graphics.getHeight()-215;
 		MIN_HEIGHT = 75;
@@ -165,9 +166,13 @@ public class Slapjack extends ApplicationAdapter {
 		
 		batch.begin();
 		batch.draw(background, 0, 0);
-		for(Sprite s: cardBackSprites){
+		for (Sprite s : cardBackSprites){
 			s.draw(batch);
 		}
+//		for(int i = 1; i < cardBackSprites.length; i++){
+//			cardBackSprites[i].draw(batch);
+//		}
+//		cardBackSprites[0].draw(batch);
 		batch.end();
 		
 		
@@ -269,6 +274,8 @@ public class Slapjack extends ApplicationAdapter {
 		Vector2 movementPositions[] = new Vector2[numPlayers];
 		int margin = ((1080 - (cardBackTexture.getWidth() * (numPlayers-1))) / numPlayers) / 2;
 		
+		targetPositions[0] = new Vector2((Gdx.graphics.getWidth()-cardBackSprites[0].getWidth())/2, (Gdx.graphics.getHeight()-cardBackSprites[1].getHeight())/10);
+		movementPositions[0] = new Vector2();
 		for(int i = 1; i < numPlayers; i++){
 			targetPositions[i] = new Vector2((i-1) * ((1080 + margin) / (numPlayers - 1)) + margin , MAX_HEIGHT);
 			movementPositions[i] = new Vector2();
@@ -277,6 +284,7 @@ public class Slapjack extends ApplicationAdapter {
 		//velocity
 		float xMovement = (100 * Gdx.graphics.getDeltaTime());
 		float yMovement = (37 * Gdx.graphics.getDeltaTime());
+		float yMovementHuman = (37 * Gdx.graphics.getDeltaTime());
 		
 		//move the cards
 		for(int i = 1; i < numPlayers; i++){
@@ -292,6 +300,15 @@ public class Slapjack extends ApplicationAdapter {
 			}
 			cardBackSprites[i].setPosition(movementPositions[i].x, movementPositions[i].y);
 		}
+		
+		// for the human player's card		
+		if(cardBackSprites[0].getY() < targetPositions[0].y){
+			movementPositions[0].y = cardBackSprites[0].getY() + yMovementHuman;
+		} else {
+			yMovementHuman = 0;
+		}
+		
+		cardBackSprites[0].setPosition((Gdx.graphics.getWidth()-cardBackSprites[0].getWidth())/2, movementPositions[0].y);
 	}
 
 	 /*******************************
