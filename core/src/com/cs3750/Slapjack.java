@@ -342,10 +342,10 @@ public class Slapjack extends ApplicationAdapter {
 			int x1 = Gdx.input.getX();
 			int y1 = Gdx.input.getY();
 			// TODO: determine the location for the cardStack
-			int xMin = 0;
-			int xMax = 100;
-			int yMin = 0;
-			int yMax = 100;
+			int xMin = (Gdx.graphics.getWidth()-cardBackTexture.getWidth())/2;  //Changed slap area to center stack
+			int xMax = (Gdx.graphics.getWidth()+cardBackTexture.getWidth())/2;;
+			int yMin = (Gdx.graphics.getHeight()-cardBackTexture.getHeight())/2;;
+			int yMax = (Gdx.graphics.getHeight()+cardBackTexture.getHeight())/2;;  
 			System.out.println("X: "+ x1 + " Y: "+y1);
 			
 			//within the boundaries
