@@ -358,13 +358,10 @@ public class Slapjack extends ApplicationAdapter {
 		}
 		return false;
 	}
-<<<<<<< HEAD
 
 	public void setJackPlayed(boolean jackPlayed) {
 		this.jackPlayed = jackPlayed;
 	}	
-}
-=======
 	
 	private void waitTimer(){
 		timer = 0f;
@@ -397,7 +394,3 @@ public class Slapjack extends ApplicationAdapter {
 	}
 	
 }
-
-
-
->>>>>>> origin/master
