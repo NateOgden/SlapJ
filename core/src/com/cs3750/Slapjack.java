@@ -3,6 +3,7 @@ package com.cs3750;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Random;
 
 import com.badlogic.gdx.ApplicationAdapter;
 import com.badlogic.gdx.Gdx;
@@ -394,15 +395,16 @@ public class Slapjack extends ApplicationAdapter {
 		}
 		return false;
 	}
-
-	public void setJackPlayed(boolean jackPlayed) {
-		this.jackPlayed = jackPlayed;
-	}	
-	
+		
 	private void waitTimer(){
+		Random r = new Random();
+		float timerPeriod = (float)r.nextInt(5);
+		if(timerPeriod <= 2f){
+			timerPeriod = 3f;
+		}
 		timer = 0f;
-		while(timer < 6f){
-			if( timer > 6f){
+		while(timer < timerPeriod){
+			if( timer > timerPeriod){
 				return;
 			} else {
 				timer += Gdx.graphics.getDeltaTime();
