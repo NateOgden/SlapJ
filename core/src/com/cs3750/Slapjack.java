@@ -160,10 +160,18 @@ public class Slapjack extends ApplicationAdapter {
 				//method called when the button is clicked
 				
 				//players.get(0).playCard();
-				cardStack.add(players.get(0).playCard());
-				lastToPlay = players.get(0);
-				// now the computer's turn
-				whoseTurn = GamePlayTurn.COMPUTER;
+				if(players.get(0).handSize() != 0){
+					cardBackSprites[0].setTexture(cardBackTexture);
+					cardStack.add(players.get(0).playCard());
+					lastToPlay = players.get(0);
+					// now the computer's turn
+					playCardButton.setVisible(false);
+					whoseTurn = GamePlayTurn.COMPUTER;
+				}
+				else{
+					cardBackSprites[0].setTexture(cardLanderTexture);
+					//the game has been lost
+				}
 			}
 		});
 		buttonMap.put("resetGameButton", new Runnable(){
@@ -278,11 +286,19 @@ public class Slapjack extends ApplicationAdapter {
 				// computer players play their cards in turn with timer delay
 				// timer delay is mostly for the human so they can slap
 				for(int i = 1; i < players.size(); i++){
-					waitTimer();
-					cardStack.add(players.get(i).playCard());
-					lastToPlay = players.get(i);
+					if(players.get(i).handSize() != 0){
+						cardBackSprites[0].setTexture(cardBackTexture);
+						waitTimer();
+						cardStack.add(players.get(i).playCard());
+						lastToPlay = players.get(i);
+					}
+					else{
+						cardBackSprites[i].setTexture(cardLanderTexture); //update the display to show that the player's hand is empty
+						continue;
+					}
 				}
 				// now the human's turn
+				playCardButton.setVisible(true);
 				whoseTurn = GamePlayTurn.HUMAN;
 			}	
 		}
