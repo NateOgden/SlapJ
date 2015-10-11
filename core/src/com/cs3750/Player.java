@@ -37,6 +37,8 @@ public class Player {
 		if(Slapjack.getJackPlayed() && rank != "JACK" && hand.isEmpty()){
 			canSlapIn = false;
 		}
+		else if(rank!="JACK")
+			return false;
 		return canSlapIn;
 	}
 	

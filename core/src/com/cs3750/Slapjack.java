@@ -511,6 +511,7 @@ public class Slapjack extends ApplicationAdapter {
 						System.out.println("Slapped");
 						players.get(0).addToHand(cardStack);
 						cardStack.clear();
+						isWinner();
 					} else {
 						//gives a card to the last person to play if slap was incorrect
 						lastToPlay.addToHand(players.get(0).giveUpCard());
@@ -539,6 +540,20 @@ public class Slapjack extends ApplicationAdapter {
 		}
 		return false;
 	}
+	private void isWinner(){
+		for (Player player : players) {
+			if(player.handSize()==52){
+				System.out.println("Someone won");
+				gamePhase = GamePhases.WINNER;
+			}
+//			if(player.handSize()==0){
+//				System.out.println(player+"Someone lost");
+//			gamePhase = GamePhases.WINNER;
+//			}
+		}
+		
+}
+
 		
 	private void waitTimer(){
 		Random r = new Random();
