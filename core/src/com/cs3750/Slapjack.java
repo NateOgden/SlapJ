@@ -151,6 +151,7 @@ public class Slapjack extends ApplicationAdapter {
 				//method called when the button is clicked
 				//the line below was part of a merge conflict
 				//deck.add(player1.playCard());
+				timer = 0f;
 				gamePhase = GamePhases.DEAL;
 				playGame();
 			}
@@ -171,12 +172,14 @@ public class Slapjack extends ApplicationAdapter {
 				else{
 					cardBackSprites[0].setTexture(cardLanderTexture);
 					//the game has been lost
+					gamePhase = GamePhases.WINNER;
 				}
 			}
 		});
 		buttonMap.put("resetGameButton", new Runnable(){
 			public void run() {
 				//method called when the button is clicked
+				resetGame();
 			}
 		});
 		buttonMap.put("testCardStack", new Runnable(){
@@ -294,7 +297,6 @@ public class Slapjack extends ApplicationAdapter {
 					}
 					else{
 						cardBackSprites[i].setTexture(cardLanderTexture); //update the display to show that the player's hand is empty
-						continue;
 					}
 				}
 				// now the human's turn
@@ -547,6 +549,20 @@ public class Slapjack extends ApplicationAdapter {
 				timer += Gdx.graphics.getDeltaTime();
 			}
 		}
+	}
+	
+	private void resetGame(){
+		players = new ArrayList<Player>();
+		cardStack = new Deck(cardSpriteSheet);
+		
+		cardBackSprites = new Sprite[numPlayers];
+		//sets all the cards initial position to the center of the screen
+		for(int i = 0; i < numPlayers; i++){	
+			cardBackSprites[i] = new Sprite(cardBackTexture);
+			cardBackSprites[i].setPosition((Gdx.graphics.getWidth()-cardBackSprites[i].getWidth())/2, (Gdx.graphics.getHeight()-cardBackSprites[i].getHeight())/2);
+		}
+		
+		gamePhase = GamePhases.TITLE_SCREEN;
 	}
 	
 	 /*******************************
