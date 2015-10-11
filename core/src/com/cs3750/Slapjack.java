@@ -158,6 +158,7 @@ public class Slapjack extends ApplicationAdapter {
 		buttonMap.put("playCardButton", new Runnable(){
 			public void run() {
 				//method called when the button is clicked
+				players.get(0).playCard();
 			}
 		});
 		buttonMap.put("resetGameButton", new Runnable(){
@@ -356,8 +357,6 @@ public class Slapjack extends ApplicationAdapter {
 		targetPositions[0] = new Vector2((Gdx.graphics.getWidth()-cardBackSprites[0].getWidth())/2, (Gdx.graphics.getHeight()-cardBackSprites[0].getHeight())/2);
 		movementPositions[0] = new Vector2();
 		
-		targetPositions[0] = new Vector2((Gdx.graphics.getWidth()-cardBackSprites[0].getWidth())/2, (Gdx.graphics.getHeight()-cardBackSprites[1].getHeight())/10);
-		movementPositions[0] = new Vector2();
 		for(int i = 1; i < numPlayers; i++){
 			if(numPlayers == 3) {
 				targetPositions[i] = new Vector2((i-1) * ((1080 + margin) / (numPlayers - 1)) + margin / 2 , MAX_HEIGHT);
@@ -393,11 +392,6 @@ public class Slapjack extends ApplicationAdapter {
 			cardBackSprites[i].setPosition(movementPositions[i].x, movementPositions[i].y);
 		}
 		
-
-		// for the human player's card		
-//		if(cardBackSprites[0].getY() < targetPositions[0].y){
-//			movementPositions[0].y = cardBackSprites[0].getY() + yMovementHuman;
-
 		// special for the human player's card		
 		if(cardBackSprites[0].getY() <= targetPositions[0].y){
 			movementPositions[0].y = cardBackSprites[0].getY() - yMovementHuman;
