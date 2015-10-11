@@ -43,6 +43,8 @@ public class Slapjack extends ApplicationAdapter {
 
 	private SpriteBatch batch;
 	private Texture background;	
+	private Texture titlescreen;
+	private BitmapFont titleFont;
 	private Texture cardSpriteSheet;
 	private Texture cardLanderTexture;
 	
@@ -89,6 +91,8 @@ public class Slapjack extends ApplicationAdapter {
 		//background
 		background = new Texture(Gdx.files.internal("rustic_background.jpg"));
 		cardLanderTexture = new Texture(Gdx.files.internal("cardStackLander.png"));
+		titlescreen = new Texture(Gdx.files.internal("titlescreen.jpg"));
+		titleFont = new BitmapFont(Gdx.files.internal("titlefont.fnt"));
 		
 		//cardSpriteSheet
 		cardSpriteSheet = new Texture(Gdx.files.internal("sprite_deck.png"));
@@ -221,7 +225,8 @@ public class Slapjack extends ApplicationAdapter {
 		batch.begin();
 		if (gamePhase == GamePhases.TITLE_SCREEN) {
 			//can change to alternative background if desired
-			batch.draw(background, 0, 0);
+			batch.draw(titlescreen, -100, -100);
+			titleFont.draw(batch, "SLAPJACK", 100, 350);
 		}
 		else if (gamePhase == GamePhases.DEAL) {
 			batch.draw(background, 0, 0);
