@@ -8,9 +8,10 @@ import java.util.Random;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Sprite;
+import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 
-public class Deck {
+public class Deck extends ArrayList<Card>{
 
 	private ArrayList<Card> deck = new ArrayList<Card>();
 	private final Sprite[] cardSprites;
@@ -50,7 +51,13 @@ public class Deck {
 		return deck.remove(0);
 	}
 
-	public void addAll(Collection <? extends Card> collection){
-		deck.addAll(collection);
-	}	
+//	public void addAll(Collection <? extends Card> collection){
+//		deck.addAll(collection);
+//	}
+	
+	public void draw(SpriteBatch batch){
+		for(Card card : deck){
+			card.draw(batch);
+		}
+	}
 }

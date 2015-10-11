@@ -39,7 +39,7 @@ public class Slapjack extends ApplicationAdapter {
 	
 	//for dynamic amount of players 
 	private ArrayList<Player> players;
-	private ArrayList<Card> cardStack;
+	private Deck cardStack;
 
 	private SpriteBatch batch;
 	private Texture background;	
@@ -78,14 +78,12 @@ public class Slapjack extends ApplicationAdapter {
 	
 	//Don't delete!
 	@Override
-	public void create () {	
+	public void create () {		
 		
 		//environment variables
 		numPlayers = 3;
 		players = new ArrayList<Player>();
-		cardStack = new ArrayList<Card>();
 		lastToPlay = null;
-		
 		batch = new SpriteBatch();
 		
 		//background
@@ -94,7 +92,8 @@ public class Slapjack extends ApplicationAdapter {
 		
 		//cardSpriteSheet
 		cardSpriteSheet = new Texture(Gdx.files.internal("sprite_deck.png"));
-
+		cardStack = new Deck(cardSpriteSheet);
+		
 		//Stage
 		startStage = new Stage();
 		stage = new Stage();
@@ -104,6 +103,7 @@ public class Slapjack extends ApplicationAdapter {
 		cardBackTexture = new Texture(Gdx.files.internal("cardback.png"));
 		
 		cardBackSprites = new Sprite[numPlayers];
+		//sets all the cards initial position to the center of the screen
 		for(int i = 0; i < numPlayers; i++){	
 			cardBackSprites[i] = new Sprite(cardBackTexture);
 			cardBackSprites[i].setPosition((Gdx.graphics.getWidth()-cardBackSprites[i].getWidth())/2, (Gdx.graphics.getHeight()-cardBackSprites[i].getHeight())/2);
@@ -196,7 +196,7 @@ public class Slapjack extends ApplicationAdapter {
 			}
 		});*/
 		
-		//add sliders to stage
+		//add sliders to stage		
 	}
 
 	//Don't delete! Used for drawing on the screen
@@ -206,19 +206,28 @@ public class Slapjack extends ApplicationAdapter {
 		Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 		
 		batch.begin();
-		batch.draw(background, 0, 0);
-
-		for (Sprite s : cardBackSprites){
-
-		batch.draw(cardLanderTexture,(Gdx.graphics.getWidth()-cardLanderTexture.getWidth())/2, (Gdx.graphics.getHeight()-cardLanderTexture.getHeight())/2);
-		
-
-			s.draw(batch);
+		if (gamePhase == GamePhases.TITLE_SCREEN) {
+			//can change to alternative background if desired
+			batch.draw(background, 0, 0);
 		}
-//		for(int i = 1; i < cardBackSprites.length; i++){
-//			cardBackSprites[i].draw(batch);
-//		}
-//		cardBackSprites[0].draw(batch);
+		else if (gamePhase == GamePhases.DEAL) {
+			batch.draw(background, 0, 0);
+			batch.draw(cardLanderTexture,(Gdx.graphics.getWidth()-cardLanderTexture.getWidth())/2, (Gdx.graphics.getHeight()-cardLanderTexture.getHeight())/2);
+			for (Sprite s : cardBackSprites){
+				s.draw(batch);
+			}
+		} 
+		else if (gamePhase == GamePhases.WINNER) {
+			//can change to alternative background if desired
+			batch.draw(background, 0, 0);
+		}
+		else {
+			batch.draw(background, 0, 0);
+			batch.draw(cardLanderTexture,(Gdx.graphics.getWidth()-cardLanderTexture.getWidth())/2, (Gdx.graphics.getHeight()-cardLanderTexture.getHeight())/2);
+			for (Sprite s : cardBackSprites){
+				s.draw(batch);
+			}
+		}
 		batch.end();
 		
 		
@@ -237,6 +246,7 @@ public class Slapjack extends ApplicationAdapter {
 		}
 		
 		if(gamePhase == GamePhases.GAME_PLAY){
+			stage.addActor(playCardButton);
 			Gdx.input.setInputProcessor(stage); 
 			stage.draw();
 		
@@ -257,7 +267,7 @@ public class Slapjack extends ApplicationAdapter {
 			} else if (whoseTurn == GamePlayTurn.COMPUTER){
 				// computer players play their cards in turn with timer delay
 				// timer delay is mostly for the human so they can slap
-				for(int i = 0; i < players.size(); i++){
+				for(int i = 1; i < players.size(); i++){
 					waitTimer();
 					cardStack.add(players.get(i).playCard());
 					lastToPlay = players.get(i);
@@ -370,7 +380,7 @@ public class Slapjack extends ApplicationAdapter {
 		//velocity
 		float xMovement = (100 * Gdx.graphics.getDeltaTime());
 		float yMovement = (37 * Gdx.graphics.getDeltaTime());
-		float yMovementHuman = (37 * Gdx.graphics.getDeltaTime());
+		float yMovementHuman = (40 * Gdx.graphics.getDeltaTime());
 		
 		//move the cards
 		for(int i = 1; i < numPlayers; i++){
@@ -460,7 +470,7 @@ public class Slapjack extends ApplicationAdapter {
 			System.out.println("X: "+ x1 + " Y: "+y1);
 			
 			//within the boundaries
-			if(x1 > xMin && x1 < xMax && y1 > yMin && y1 < yMax){
+			if(x1 > xMin && x1 < xMax && y1 > yMin && y1 < yMax && cardStack.size() != 0){
 				    //get the player who slapped and call their slap method to determine validity
 					String topCard = cardStack.get(cardStack.size()-1).getRank();
 					if(players.get(0).slap(topCard)){
@@ -485,13 +495,13 @@ public class Slapjack extends ApplicationAdapter {
 			// TODO: determine the location for the cardStack, 
 			int xMin = (Gdx.graphics.getWidth()-cardBackTexture.getWidth())/2;
 			int xMax = (Gdx.graphics.getWidth()+cardBackTexture.getWidth())/2;
-			int yMin = (Gdx.graphics.getHeight()-cardBackTexture.getHeight())/10;
-			int yMax = (Gdx.graphics.getHeight()+cardBackTexture.getHeight())/10;
+			int yMin = ((Gdx.graphics.getHeight()/2)-cardBackTexture.getHeight()+50);
+			int yMax = ((Gdx.graphics.getHeight()/2)+cardBackTexture.getHeight()+50);
 			
 			//within the boundaries
 			if(x1 > xMin && x1 < xMax && y1 > yMin && y1 < yMax){
 					System.out.println("Player played card");
-					players.get(0).playCard();
+					return true;
 			}
 		}
 		return false;
@@ -510,7 +520,6 @@ public class Slapjack extends ApplicationAdapter {
 			} else {
 				timer += Gdx.graphics.getDeltaTime();
 			}
-			
 		}
 	}
 	
