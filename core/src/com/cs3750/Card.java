@@ -1,5 +1,6 @@
 package com.cs3750;
 
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 
@@ -23,10 +24,11 @@ public class Card {
 	}
 	
 	public void draw(SpriteBatch batch) {
+		sprite.setPosition((Gdx.graphics.getWidth() - sprite.getWidth()) / 2, (Gdx.graphics.getHeight() - sprite.getHeight()) / 2);
 		sprite.draw(batch);
 	}
 	
-	public void SetPosition(int xPos, int yPos) {
+	public void SetPosition(float xPos, float yPos) {
 		sprite.setPosition(xPos, yPos);
 	}
 	
@@ -36,10 +38,6 @@ public class Card {
 	
 	public float getY() {
 		return sprite.getY();
-	}
-	
-	public int getWidth() {
-		return (int)sprite.getWidth();
 	}
 	
 	public String getSuit() {

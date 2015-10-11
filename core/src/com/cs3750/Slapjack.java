@@ -227,6 +227,10 @@ public class Slapjack extends ApplicationAdapter {
 			for (Sprite s : cardBackSprites){
 				s.draw(batch);
 			}
+			
+			if(!cardStack.isEmpty()){
+				cardStack.get(cardStack.size()-1).draw(batch);
+			}
 		}
 		batch.end();
 		
