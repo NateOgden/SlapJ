@@ -158,7 +158,12 @@ public class Slapjack extends ApplicationAdapter {
 		buttonMap.put("playCardButton", new Runnable(){
 			public void run() {
 				//method called when the button is clicked
-				players.get(0).playCard();
+				
+				//players.get(0).playCard();
+				cardStack.add(players.get(0).playCard());
+				lastToPlay = players.get(0);
+				// now the computer's turn
+				whoseTurn = GamePlayTurn.COMPUTER;
 			}
 		});
 		buttonMap.put("resetGameButton", new Runnable(){
@@ -260,15 +265,16 @@ public class Slapjack extends ApplicationAdapter {
 			//always checking to see if a slap has happened
 			checkForSlap();
 			
-			if(whoseTurn == GamePlayTurn.HUMAN){
-				// manually play their card by clicking on their deck
-				if(checkForCardPlay()){
-					cardStack.add(players.get(0).playCard());
-					lastToPlay = players.get(0);
-					// now the computer's turn
-					whoseTurn = GamePlayTurn.COMPUTER;
-				}
-			} else if (whoseTurn == GamePlayTurn.COMPUTER){
+			//if(whoseTurn == GamePlayTurn.HUMAN){
+			//	// manually play their card by clicking on their deck
+			//	if(checkForCardPlay()){
+			//		cardStack.add(players.get(0).playCard());
+			//		lastToPlay = players.get(0);
+			//		// now the computer's turn
+			//		whoseTurn = GamePlayTurn.COMPUTER;
+			//	}
+			//} else 
+			if (whoseTurn == GamePlayTurn.COMPUTER){
 				// computer players play their cards in turn with timer delay
 				// timer delay is mostly for the human so they can slap
 				for(int i = 1; i < players.size(); i++){
