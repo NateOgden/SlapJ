@@ -173,7 +173,6 @@ public class Slapjack extends ApplicationAdapter {
 					cardStack.add(players.get(0).playCard());
 					lastToPlay = players.get(0);
 					// now the computer's turn
-					playCardButton.setVisible(false);
 					whoseTurn = GamePlayTurn.COMPUTER;
 				}
 				else{
@@ -299,7 +298,7 @@ public class Slapjack extends ApplicationAdapter {
 				for(int i = 1; i < players.size(); i++){
 					if(players.get(i).handSize() != 0){
 						
-						cardBackSprites[0].setTexture(cardBackTexture);
+						cardBackSprites[i].setTexture(cardBackTexture);
 						if(!timerIsOn){
 							final int k = i;
 							timerIsOn = true;
@@ -335,7 +334,6 @@ public class Slapjack extends ApplicationAdapter {
 				}
 				
 				// now the human's turn
-				playCardButton.setVisible(true);
 				whoseTurn = GamePlayTurn.HUMAN;
 			}	
 		}
@@ -343,6 +341,13 @@ public class Slapjack extends ApplicationAdapter {
 		if(gamePhase == GamePhases.WINNER){
 			Gdx.input.setInputProcessor(endStage); 
 			endStage.draw();
+		}
+		
+		if(timerIsOn){
+			playCardButton.setVisible(false);
+		}
+		else if(!timerIsOn){
+			playCardButton.setVisible(true);
 		}
 	}
 
