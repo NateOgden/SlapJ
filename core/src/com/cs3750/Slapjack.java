@@ -242,8 +242,8 @@ public class Slapjack extends ApplicationAdapter {
 			}
 		} 
 		else if (gamePhase == GamePhases.WINNER) {
-			//can change to alternative background if desired
-			batch.draw(background, 0, 0);
+			batch.draw(titlescreen, -100, -100);
+			titleFont.draw(batch, "GAME OVER", 100, 350);
 		}
 		else {
 			batch.draw(background, 0, 0);
