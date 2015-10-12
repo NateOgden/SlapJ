@@ -309,7 +309,7 @@ public class Slapjack extends ApplicationAdapter {
 								
 								@Override
 								public void run() {
-									if(cardStack.get(cardStack.size() - 1).getRank() == "JACK"){
+									if(cardStack.size() > 0 && cardStack.get(cardStack.size() - 1).getRank() == "JACK"){
 										checkForSlap(true);
 									}
 									else
