@@ -29,6 +29,8 @@ import com.badlogic.gdx.scenes.scene2d.ui.TextButton.TextButtonStyle;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.scenes.scene2d.ui.ProgressBar.ProgressBarStyle;
 import com.badlogic.gdx.scenes.scene2d.ui.Slider.SliderStyle;
+import com.badlogic.gdx.utils.Timer;
+import com.badlogic.gdx.utils.Timer.Task;
 
 public class Slapjack extends ApplicationAdapter {
 	public enum GamePhases{ TITLE_SCREEN, DEAL, GAME_PLAY, WINNER }
@@ -36,6 +38,7 @@ public class Slapjack extends ApplicationAdapter {
 	public enum GamePlayTurn{HUMAN, COMPUTER}
 	private GamePlayTurn whoseTurn = GamePlayTurn.HUMAN;
 	private Player lastToPlay; 
+	private boolean timerIsOn = false;
 	
 	//for dynamic amount of players 
 	private ArrayList<Player> players;
@@ -295,10 +298,26 @@ public class Slapjack extends ApplicationAdapter {
 				// timer delay is mostly for the human so they can slap
 				for(int i = 1; i < players.size(); i++){
 					if(players.get(i).handSize() != 0){
+						
 						cardBackSprites[0].setTexture(cardBackTexture);
-						waitTimer();
-						cardStack.add(players.get(i).playCard());
-						lastToPlay = players.get(i);
+						if(!timerIsOn){
+							final int k = i;
+							timerIsOn = true;
+							
+							Timer.schedule(new Task()  {
+								//line below can probably be changed somehow
+								int j = k;
+								
+								@Override
+								public void run() {
+									cardStack.add(players.get(j).playCard());
+									lastToPlay = players.get(j);
+									timerIsOn = false;
+									Timer.instance().clear();
+									j++;
+								}
+							}, 5);
+						}
 					}
 					else{
 						cardBackSprites[i].setTexture(cardLanderTexture); //update the display to show that the player's hand is empty
@@ -562,7 +581,9 @@ public class Slapjack extends ApplicationAdapter {
 		}
 		timer = 0f;
 		while(timer < timerPeriod){
+			Gdx.graphics.setContinuousRendering(false);
 			if( timer > timerPeriod){
+				Gdx.graphics.setContinuousRendering(true);
 				return;
 			} else {
 				timer += Gdx.graphics.getDeltaTime();
