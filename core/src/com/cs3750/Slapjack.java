@@ -206,28 +206,9 @@ public class Slapjack extends ApplicationAdapter {
 		//add actors to stage
 		startStage.addActor(playGameButton);
 		stage.addActor(playCardButton);
-		stage.addActor(testCardStack);
+//		stage.addActor(testCardStack);
 		endStage.addActor(resetGameButton);
-		
-		//TODO COMPLETE
-		//add sliders to map
-		/*buttonMap.put("numOfPlayerSlider", new Runnable() {
-			public void run(){
-				
-			}
-		});
-		buttonMap.put("difficultySlider", new Runnable() {
-			public void run(){
-				
-			}
-		});
-		buttonMap.put("resetSlider", new Runnable() {
-			public void run(){
-				
-			}
-		});*/
-		
-		//add sliders to stage		
+			
 	}
 
 	//Don't delete! Used for drawing on the screen
@@ -263,6 +244,7 @@ public class Slapjack extends ApplicationAdapter {
 			
 			for (int i = 0; i < players.size(); i++){
 				playersScore[i] = players.get(i).handSize();
+				
 				cardsInHand = playersScore[i] + " cards";
 				boardFont.draw(batch, cardsInHand, cardBackSprites[i].getX()+150, cardBackSprites[i].getY()+50);
 			}
@@ -378,18 +360,6 @@ public class Slapjack extends ApplicationAdapter {
 		return button;
 	}
 	
-	//this method is used to create a slider
-	//	private Slider getSlider(String sliderText, int xPosition, 
-	//			int yPosition, final String id, SliderStyle sliderStyle) {
-	//		Slider sliders = new Slider(xPosition, yPosition, 1, false, sliderStyle);
-	//		sliders.setPosition(xPosition, yPosition);
-	//		sliders.addListener(new ClickListener(){
-	//			public void clicked(InputEvent event, float x, float y) {
-	//				buttonMap.get(id).run();
-	//			}
-	//		});
-	//		return sliders;
-	//	}
 	
 	 /*******************************
 	 * Animation Methods
