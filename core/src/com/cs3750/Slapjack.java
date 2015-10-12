@@ -86,7 +86,7 @@ public class Slapjack extends ApplicationAdapter {
 	public void create () {		
 		
 		//environment variables
-		numPlayers = 3;
+		numPlayers = 2;
 		players = new ArrayList<Player>();
 		lastToPlay = null;
 		batch = new SpriteBatch();
@@ -282,7 +282,7 @@ public class Slapjack extends ApplicationAdapter {
 			checkForJack();
 			
 			//always checking to see if a slap has happened
-			checkForSlap();
+			checkForSlap(false);
 			
 			//if(whoseTurn == GamePlayTurn.HUMAN){
 			//	// manually play their card by clicking on their deck
@@ -310,19 +310,30 @@ public class Slapjack extends ApplicationAdapter {
 								
 								@Override
 								public void run() {
-									cardStack.add(players.get(j).playCard());
+									if(cardStack.get(cardStack.size() - 1).getRank() == "JACK"){
+										checkForSlap(true);
+									}
+									else
+									{
+										cardStack.add(players.get(j).playCard());
+										if(cardStack.get(cardStack.size() - 1).getRank() == "JACK"){
+											checkForSlap(true);
+										}
+									}
+									
 									lastToPlay = players.get(j);
 									timerIsOn = false;
 									Timer.instance().clear();
 									j++;
 								}
-							}, 5);
+							}, 2);
 						}
 					}
 					else{
 						cardBackSprites[i].setTexture(cardLanderTexture); //update the display to show that the player's hand is empty
-					}
+					}	
 				}
+				
 				// now the human's turn
 				playCardButton.setVisible(true);
 				whoseTurn = GamePlayTurn.HUMAN;
@@ -509,9 +520,9 @@ public class Slapjack extends ApplicationAdapter {
 	}
 	
 	// run in the render method to see if a player has slapped 
-	private void checkForSlap() {
+	private void checkForSlap(boolean bool) {
 		// if the mouse click happened over the cardStack pile in the center of the play window
-		if(Gdx.input.isTouched()){
+		if(Gdx.input.isTouched() || bool){
 			int x1 = Gdx.input.getX();
 			int y1 = Gdx.input.getY();
 			//Target of the discard pile
@@ -522,7 +533,7 @@ public class Slapjack extends ApplicationAdapter {
 			System.out.println("X: "+ x1 + " Y: "+y1);
 			
 			//within the boundaries
-			if(x1 > xMin && x1 < xMax && y1 > yMin && y1 < yMax && cardStack.size() != 0){
+			if(x1 > xMin && x1 < xMax && y1 > yMin && y1 < yMax && cardStack.size() != 0 || bool){
 				    //get the player who slapped and call their slap method to determine validity
 					String topCard = cardStack.get(cardStack.size()-1).getRank();
 					if(players.get(0).slap(topCard)){
