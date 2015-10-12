@@ -1,6 +1,7 @@
 package com.cs3750;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Random;
@@ -309,29 +310,38 @@ public class Slapjack extends ApplicationAdapter {
 								
 								@Override
 								public void run() {
-									if(cardStack.size() > 0 && cardStack.get(cardStack.size() - 1).getRank() == "JACK"){
+									if(cardStack.size() > 0 && cardStack.get(cardStack.size() - 1).getRank() == "JACK") {
 										checkForSlap(true);
 									}
 									else
 									{
 										cardStack.add(players.get(j).playCard());
-										if(cardStack.get(cardStack.size() - 1).getRank() == "JACK"){
-											checkForSlap(true);
+										lastToPlay = players.get(j);
+										if(cardStack.size() > 0 && cardStack.get(cardStack.size() - 1).getRank() == "JACK"){
+											Timer.schedule(new Task(){
+												@Override
+												public void run() {
+													checkForSlap(true);
+												}
+											}, 2);//time to wait
 										}
 									}
 									
-									lastToPlay = players.get(j);
+									
 									timerIsOn = false;
 									Timer.instance().clear();
 									j++;
 								}
 							}, 2);
+							
 						}
+						
 					}
 					else{
 						cardBackSprites[i].setTexture(cardLanderTexture); //update the display to show that the player's hand is empty
 					}	
 				}
+				
 				
 				// now the human's turn
 				whoseTurn = GamePlayTurn.HUMAN;
@@ -539,18 +549,34 @@ public class Slapjack extends ApplicationAdapter {
 			
 			//within the boundaries
 			if(x1 > xMin && x1 < xMax && y1 > yMin && y1 < yMax && cardStack.size() != 0 || bool){
-				    //get the player who slapped and call their slap method to determine validity
-					String topCard = cardStack.get(cardStack.size()-1).getRank();
+			    //get the player who slapped and call their slap method to determine validity
+				String topCard = cardStack.get(cardStack.size()-1).getRank();
+				if(bool)
+				{
+					if(players.get(1).slap(topCard)){
+						//player gets the stack of cards with a correct slap
+						System.out.println("Slapped");
+						players.get(1).addToHand(cardStack);		
+						cardStack.clear();
+						isWinner();
+					} else {
+						//gives a card to the last person to play if slap was incorrect
+						lastToPlay.addToHand(players.get(1).giveUpCard());
+					}
+				}
+				else
+				{
 					if(players.get(0).slap(topCard)){
 						//player gets the stack of cards with a correct slap
 						System.out.println("Slapped");
-						players.get(0).addToHand(cardStack);
+						players.get(0).addToHand(cardStack);		
 						cardStack.clear();
 						isWinner();
 					} else {
 						//gives a card to the last person to play if slap was incorrect
 						lastToPlay.addToHand(players.get(0).giveUpCard());
 					}
+				}	
 			}
 		}
 	}
