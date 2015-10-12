@@ -40,6 +40,10 @@ public class Slapjack extends ApplicationAdapter {
 	private GamePlayTurn whoseTurn = GamePlayTurn.HUMAN;
 	private Player lastToPlay; 
 	private boolean timerIsOn = false;
+	private boolean timerForJackIsOn = false;
+	private int computerTurn = 0;
+	private int[] playersScore;
+	private String cardsInHand;
 	
 	//for dynamic amount of players 
 	private ArrayList<Player> players;
@@ -49,6 +53,7 @@ public class Slapjack extends ApplicationAdapter {
 	private Texture background;	
 	private Texture titlescreen;
 	private BitmapFont titleFont;
+	private BitmapFont boardFont;
 	private Texture cardSpriteSheet;
 	private Texture cardLanderTexture;
 	
@@ -91,12 +96,15 @@ public class Slapjack extends ApplicationAdapter {
 		players = new ArrayList<Player>();
 		lastToPlay = null;
 		batch = new SpriteBatch();
+		playersScore = new int[numPlayers];
+		cardsInHand = "0 cards";
 		
 		//background
 		background = new Texture(Gdx.files.internal("rustic_background.jpg"));
 		cardLanderTexture = new Texture(Gdx.files.internal("cardStackLander.png"));
 		titlescreen = new Texture(Gdx.files.internal("titlescreen.jpg"));
 		titleFont = new BitmapFont(Gdx.files.internal("titlefont.fnt"));
+		boardFont = new BitmapFont(Gdx.files.internal("board_font.fnt"));
 		
 		//cardSpriteSheet
 		cardSpriteSheet = new Texture(Gdx.files.internal("sprite_deck.png"));
@@ -248,8 +256,15 @@ public class Slapjack extends ApplicationAdapter {
 		else {
 			batch.draw(background, 0, 0);
 			batch.draw(cardLanderTexture,(Gdx.graphics.getWidth()-cardLanderTexture.getWidth())/2, (Gdx.graphics.getHeight()-cardLanderTexture.getHeight())/2);
+			
 			for (Sprite s : cardBackSprites){
 				s.draw(batch);
+			}
+			
+			for (int i = 0; i < players.size(); i++){
+				playersScore[i] = players.get(i).handSize();
+				cardsInHand = playersScore[i] + " cards";
+				boardFont.draw(batch, cardsInHand, cardBackSprites[i].getX()+150, cardBackSprites[i].getY()+50);
 			}
 			
 			if(!cardStack.isEmpty()){
@@ -283,66 +298,46 @@ public class Slapjack extends ApplicationAdapter {
 			
 			//always checking to see if a slap has happened
 			checkForSlap(false);
-			
-			//if(whoseTurn == GamePlayTurn.HUMAN){
-			//	// manually play their card by clicking on their deck
-			//	if(checkForCardPlay()){
-			//		cardStack.add(players.get(0).playCard());
-			//		lastToPlay = players.get(0);
-			//		// now the computer's turn
-			//		whoseTurn = GamePlayTurn.COMPUTER;
-			//	}
-			//} else 
+
 			if (whoseTurn == GamePlayTurn.COMPUTER){
 				// computer players play their cards in turn with timer delay
 				// timer delay is mostly for the human so they can slap
 				for(int i = 1; i < players.size(); i++){
 					if(players.get(i).handSize() != 0){
-						
-						cardBackSprites[i].setTexture(cardBackTexture);
+						computerTurn = i;
+						cardBackSprites[0].setTexture(cardBackTexture);
 						if(!timerIsOn){
-							final int k = i;
 							timerIsOn = true;
-							
-							Timer.schedule(new Task()  {
-								//line below can probably be changed somehow
-								int j = k;
-								
+							Timer.schedule(new Task()  {	
 								@Override
 								public void run() {
 									if(cardStack.size() > 0 && cardStack.get(cardStack.size() - 1).getRank() == "JACK") {
 										checkForSlap(true);
-									}
-									else
-									{
-										cardStack.add(players.get(j).playCard());
-										lastToPlay = players.get(j);
-										if(cardStack.size() > 0 && cardStack.get(cardStack.size() - 1).getRank() == "JACK"){
+									} else{
+										cardStack.add(players.get(computerTurn).playCard());
+										if(cardStack.get(cardStack.size() - 1).getRank() == "JACK"){
 											Timer.schedule(new Task(){
 												@Override
 												public void run() {
 													checkForSlap(true);
 												}
-											}, 2);//time to wait
+											},randomTime()); //time to wait
+										
+//											System.out.println("COMPUTER is about to slap");
+//											computerSlapped();
 										}
 									}
-									
-									
+									lastToPlay = players.get(computerTurn);
 									timerIsOn = false;
 									Timer.instance().clear();
-									j++;
 								}
 							}, 2);
-							
 						}
-						
 					}
 					else{
 						cardBackSprites[i].setTexture(cardLanderTexture); //update the display to show that the player's hand is empty
 					}	
 				}
-				
-				
 				// now the human's turn
 				whoseTurn = GamePlayTurn.HUMAN;
 			}	
@@ -534,6 +529,25 @@ public class Slapjack extends ApplicationAdapter {
 		return jackPlayed;
 	}
 	
+	private void computerSlapped(){
+		System.out.println("Just got inside the computerSlapped method");
+		Timer.instance().clear();
+		if(!timerForJackIsOn){
+			System.out.println("Just got inside the if statement of the computerSlapped method");
+			timerForJackIsOn = true;
+			
+			Timer.schedule(new Task() {
+				@Override
+				public void run() {
+					System.out.println("Just got inside the run method of the computerSlapped method");
+					checkForSlap(true);
+					timerForJackIsOn = false;
+				}
+			}, 1,0,1);
+		}
+		
+	}
+	
 	// run in the render method to see if a player has slapped 
 	private void checkForSlap(boolean bool) {
 		// if the mouse click happened over the cardStack pile in the center of the play window
@@ -581,39 +595,40 @@ public class Slapjack extends ApplicationAdapter {
 		}
 	}
 	
+	//UNUSED CODE
 	// run in the render method to see if a player has played their card
-	private Boolean checkForCardPlay() {
-		// if the mouse click happened over the cardStack pile in the center of the play window
-		if(Gdx.input.isTouched()){
-			int x1 = Gdx.input.getX();
-			int y1 = Gdx.input.getY();
-			int xMin = (Gdx.graphics.getWidth()-cardBackTexture.getWidth())/2;
-			int xMax = (Gdx.graphics.getWidth()+cardBackTexture.getWidth())/2;
-			int yMin = ((Gdx.graphics.getHeight()/2)-cardBackTexture.getHeight()+50);
-			int yMax = ((Gdx.graphics.getHeight()/2)+cardBackTexture.getHeight()+50);
-			
-			//within the boundaries
-			if(x1 > xMin && x1 < xMax && y1 > yMin && y1 < yMax){
-					System.out.println("Player played card");
-					return true;
-			}
-		}
-		return false;
-	}
+//	private Boolean checkForCardPlay() {
+//		// if the mouse click happened over the cardStack pile in the center of the play window
+//		if(Gdx.input.isTouched()){
+//			int x1 = Gdx.input.getX();
+//			int y1 = Gdx.input.getY();
+//			int xMin = (Gdx.graphics.getWidth()-cardBackTexture.getWidth())/2;
+//			int xMax = (Gdx.graphics.getWidth()+cardBackTexture.getWidth())/2;
+//			int yMin = ((Gdx.graphics.getHeight()/2)-cardBackTexture.getHeight()+50);
+//			int yMax = ((Gdx.graphics.getHeight()/2)+cardBackTexture.getHeight()+50);
+//			
+//			//within the boundaries
+//			if(x1 > xMin && x1 < xMax && y1 > yMin && y1 < yMax){
+//					System.out.println("Player played card");
+//					return true;
+//			}
+//		}
+//		return false;
+//	}
+	
 	private void isWinner(){
 		for (Player player : players) {
 			if(player.handSize()==52){
 				System.out.println("Someone won");
 				gamePhase = GamePhases.WINNER;
 			}
-//			if(player.handSize()==0){
-//				System.out.println(player+"Someone lost");
-//			gamePhase = GamePhases.WINNER;
-//			}
-		}
-		
+		}	
 }
 
+	private int randomTime(){
+		Random r = new Random();
+		return r.nextInt(3);
+	}
 		
 	private void waitTimer(){
 		Random r = new Random();
